@@ -2,12 +2,12 @@ import { useMutation } from "@tanstack/react-query"
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import React, { ChangeEvent, useState, useEffect } from "react"
-import CustomButton from "@components/common/CustomButton"
 import CustomInput from "@components/common/CustomInput"
 import { NOTIFICATION_TYPE, notify } from "@utils/notify"
 import { API_ENDPOINT } from "@models/api"
 import { useBoundStore } from "@zustand/total"
 import { useRouter } from "next/router"
+import { CustomButton } from "@components/common/CustomButton"
 
 export type ChangePassRequest = {
   oldPass: string
@@ -26,12 +26,12 @@ const ChangePassword = () => {
     removeAuthInfo: state.removeAuthInfo,
   }))
 
-  useEffect(() => {
-    if (authInfo.accessToken == null) {
-      notify(NOTIFICATION_TYPE.ERROR, `Unauthorize`)
-      route.push("/login")
-    }
-  }, [])
+  // useEffect(() => {
+  //   if (authInfo.accessToken == null) {
+  //     notify(NOTIFICATION_TYPE.ERROR, `Unauthorize`)
+  //     route.push("/login")
+  //   }
+  // }, [])
 
   const [changePass, setChangePass] = useState<ChangePassRequest>({
     oldPass: "",
@@ -45,7 +45,7 @@ const ChangePassword = () => {
   })
 
   const putChangePassword = async (changePass: ChangePassRequest): Promise<Response> => {
-    const token = "Bearer " + authInfo.accessToken
+    const token = "Bearer " + authInfo.access
     const response = await fetch(API_ENDPOINT + "/user/change-pass", {
       method: "PUT",
       headers: {
@@ -101,7 +101,7 @@ const ChangePassword = () => {
   }
 
   return (
-    <div className="hero min-h-screen bg-theme">
+    <div className="bg-theme hero min-h-screen">
       <div className="flex items-center gap-12">
         <div className="card hidden w-1/2 items-center justify-center p-8 shadow-2xl lg:flex">
           <img src="images/auth-forgot-password.png" alt="" className="w-[60%]" />
@@ -137,7 +137,7 @@ const ChangePassword = () => {
                 onChange={handleChangeInput}
               />
               {errorMessage.reEnterPass && <span className="text-red-600">{errorMessage.reEnterPass}</span>}
-              <CustomButton label="Change" />
+              <CustomButton color="green">Change</CustomButton>
               <div className="flex justify-center gap-2">
                 <Link href="login" className="text-primary-400 hover:underline">
                   Back to login

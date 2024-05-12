@@ -1,32 +1,20 @@
+import { User } from "@models/user"
 import { StateCreator } from "zustand"
-import { AccountInfo } from "@models/common"
 
 export interface AccountInfoSlice {
-  accountInfo: AccountInfo
-  saveAccountInfo: (payload: AccountInfo) => void
+  accountInfo?: User
+  saveAccountInfo: (payload: User) => void
   removeAccountInfo: () => void
 }
 
 export const createAccountInfoSlice: StateCreator<AccountInfoSlice, [], [], AccountInfoSlice> = (set) => ({
-  accountInfo: {
-    userId: null,
-    username: null,
-    gmail: null,
-    picture: null,
-    role: null,
-  },
-  saveAccountInfo: (payload: AccountInfo) =>
+  accountInfo: {},
+  saveAccountInfo: (payload: User) =>
     set(() => ({
       accountInfo: payload,
     })),
   removeAccountInfo: () =>
     set(() => ({
-      accountInfo: {
-        userId: null,
-        username: null,
-        gmail: null,
-        picture: null,
-        role: null,
-      },
+      accountInfo: {},
     })),
 })

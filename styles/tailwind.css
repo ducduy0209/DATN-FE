@@ -63,3 +63,7 @@
     transform: rotate(180deg);
   }
 }
+
+.my_slider {
+  z-index: 1;
+}

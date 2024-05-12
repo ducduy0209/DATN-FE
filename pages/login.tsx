@@ -1,4 +1,4 @@
-import { Button, Input } from "@nextui-org/react"
+import { Button, Checkbox, Input } from "@nextui-org/react"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import React, { ChangeEvent, useState } from "react"
@@ -7,15 +7,13 @@ import { API_ENDPOINT, Response } from "@models/api"
 import decodeJWT from "@utils/decodeJWT"
 import { NOTIFICATION_TYPE, notify } from "@utils/notify"
 import { useBoundStore } from "@zustand/total"
+import { Image } from "@nextui-org/react"
+import { CustomButton } from "@components/common/CustomButton"
+import { AccountInfo } from "@models/user"
 
 type LoginInfo = {
   email: string
   password: string
-}
-
-type AuthInfo = {
-  accessToken: string
-  refreshToken: string
 }
 
 const Login = () => {
@@ -61,31 +59,32 @@ const Login = () => {
   const onLogin = async () => {
     if (!loginInfo.email || !loginInfo.password) {
       setErrorMessage({
-        email: !loginInfo.email ? "Field email is require!" : "",
-        password: !loginInfo.password ? "Field password is require!" : "",
+        email: !loginInfo.email ? "Email is require!" : "",
+        password: !loginInfo.password ? "Password is require!" : "",
       })
     } else {
-      const response = await fetch(API_ENDPOINT + "/user/login", {
+      const response = await fetch(API_ENDPOINT + "/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginInfo),
       })
-      const data = (await response.json()) as Response<AuthInfo>
-      if (data.success) {
+      const data = (await response.json()) as Response<AccountInfo>
+      if (data.data) {
         saveAuthInfo({
-          accessToken: data?.data?.accessToken ?? "",
-          refreshToken: data?.data?.refreshToken ?? "",
+          access: data.data.tokens.access,
+          refresh: data.data.tokens.refresh,
         })
-        const decodedJWT = decodeJWT(data?.data?.accessToken ?? "")
-        const atIndex = decodedJWT?.data?.email.indexOf('@') ?? 0
-        saveAccountInfo({
-          userId: decodedJWT?.data._id ?? "",
-          username: decodedJWT?.data?.email?.slice(0, atIndex) ?? "",
-          gmail: decodedJWT?.data?.email ?? "",
-          picture: null,
-          role: decodedJWT?.data?.role ?? "",
-        })
-        route.push("/prices")
+        saveAccountInfo({ ...data.data.user })
+        //TODO: check gain
+        // if (data.data.user.isEmailVerified) {
+        //   saveAccountInfo({
+        //     ...data.data.user,
+        //   })
+        //   route.push("/")
+        // } else {
+        //   route.push("/verify-account")
+        // }
+        route.push("/")
         setTimeout(() => {
           notify(NOTIFICATION_TYPE.SUCCESS, "Login successfully!")
         }, 50)
@@ -96,15 +95,22 @@ const Login = () => {
   }
 
   return (
-    <div className="hero min-h-screen bg-theme">
+    <div className="bg-theme hero min-h-screen">
       <div className="flex h-full">
         <div className="basis-1/2">
-          <img src="images/auth-login.webp" alt="" className="h-full w-full object-cover" />
+          <img
+            src="https://th-thumbnailer.cdn-si-edu.com/sWf0xF1il7OWYO8j-PGqwBvxTAE=/1000x750/filters:no_upscale():focal(2550x1724:2551x1725)/https://tf-cmsv2-smithsonianmag-media.s3.amazonaws.com/filer_public/9a/d7/9ad71c28-a69d-4bc0-b03d-37160317bb32/gettyimages-577674005.jpg"
+            alt=""
+            className="h-full w-full object-cover"
+          />
         </div>
-        <div className="my-auto shrink-0 basis-1/2 px-40">
-          <div className="text-center text-slate-400 lg:text-left">
-            <h1 className="text-5xl font-bold">Welcome to Boostera! 👋🏻</h1>
-            <p className="py-6">Please sign-in to your account and start the adventure.</p>
+        <div className="my-auto shrink-0 basis-1/2 px-28">
+          <div className="flex w-full justify-center">
+            <Image width={50} height={50} alt="logo" src="/images/logo.png" />
+          </div>
+          <div className="text-center text-green-400 lg:text-left">
+            <h1 className="text-5xl font-bold">Welcome to Merchize Book Store! 👋🏻</h1>
+            <p className="py-6 text-slate-500">Please sign-in to your account and start the adventure.</p>
           </div>
           <div className="flex w-full flex-col gap-4">
             <p className="text-default-400">Email</p>
@@ -126,15 +132,22 @@ const Login = () => {
             />
             <p className="text-sm text-red-400">{errorMessage.password && errorMessage.password}</p>
             <div className="flex items-center justify-between">
-              <CheckBox label="Remember Me" isChecked={isRemember} onClick={() => setIsRemember(!isRemember)} />
+              <Checkbox isSelected={isRemember} color="success" onClick={() => setIsRemember(!isRemember)}>
+                Remember me
+              </Checkbox>
               <Link href="forgot-password" className="text-primary-400 hover:underline">
                 Forgot Password?
               </Link>
-              II
             </div>
-            <Button onClick={onLogin} color="primary" isDisabled={!!errorMessage.email || !!errorMessage.password}>
+            <CustomButton onClick={onLogin} color="green" isDisabled={!!errorMessage.email || !!errorMessage.password}>
               Login
-            </Button>
+            </CustomButton>
+            <div className="flex justify-center gap-1">
+              <p>You don't have account?</p>
+              <Link href="/register" className="text-blue-400 hover:text-blue-500">
+                Register now.
+              </Link>
+            </div>
           </div>
         </div>
       </div>

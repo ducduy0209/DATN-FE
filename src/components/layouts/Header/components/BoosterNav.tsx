@@ -4,6 +4,7 @@ import React, { useRef, useState } from "react"
 import { useClickOutside } from "@hooks/useClickOutside"
 import { useBoundStore } from "@zustand/total"
 import DropDownMenu from "./DropDownMenu"
+import { CustomButton } from "@components/common/CustomButton"
 const BoosterNav = () => {
   const [isOpenDropDownMenu, setIsOpenDropDownMenu] = useState<boolean>(false)
   const toggleRef = useRef<HTMLDivElement>(null)
@@ -21,30 +22,25 @@ const BoosterNav = () => {
   }))
 
   return (
-    <div className="flex items-center font-semibold">
-      <Link href="/my-jobs">
-        <p className="cursor-pointer rounded-lg px-4 py-2 text-white transition-all delay-[20ms] hover:text-red-500">
-          My Jobs
-        </p>
-      </Link>
-      <Link href="/jobs">
-        <p className="cursor-pointer rounded-lg px-4 py-2 text-white transition-all delay-[20ms] hover:text-red-500">
-          Register New Jobs
-        </p>
-      </Link>
-      <Link href="/request-withdraw">
-        <p className="cursor-pointer rounded-lg px-4 py-2 text-white transition-all delay-[20ms] hover:text-red-500">
-          Request Withdraw
-        </p>
+    <div className="flex items-center gap-4 font-semibold">
+      <Link href="/cart">
+        <CustomButton>Giỏ Sách</CustomButton>
       </Link>
       <div className="relative" ref={toggleRef} onMouseDown={handleMouseDown}>
-        <div className="cursor-pointer rounded-xl border bg-white px-4 py-1 text-sm font-semibold text-black transition-all delay-75 hover:border-white hover:bg-black hover:text-white flex items-center gap-2">
-          <Avatar size="sm" />
-          {accountInfo?.username?.slice(0, 7)}...
+        <div className="bg-green flex cursor-pointer items-center gap-2 rounded-xl border px-4 py-1 text-sm font-semibold text-black transition-all delay-75 hover:border-white hover:bg-green-400 hover:text-white">
+          {accountInfo?.image ? (
+            <Avatar size="sm" src={accountInfo?.image} className="border-2" />
+          ) : (
+            <Avatar size="sm" name={accountInfo?.name} />
+          )}
+          {accountInfo?.name?.slice(0, 7)}...
         </div>
-      </div>
-      <div className={`absolute right-8 top-16 ${isOpenDropDownMenu ? "menu-show" : "menu-hidden"}`} ref={dropDownRef}>
-        <DropDownMenu />
+        <div
+          className={`absolute left-0 top-14 shadow-xl ${isOpenDropDownMenu ? "menu-show" : "menu-hidden"}`}
+          ref={dropDownRef}
+        >
+          <DropDownMenu />
+        </div>
       </div>
     </div>
   )

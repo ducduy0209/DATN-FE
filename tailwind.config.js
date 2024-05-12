@@ -1,21 +1,25 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const { nextui } = require("@nextui-org/react");
+const { nextui } = require("@nextui-org/react")
 const defaultTheme = require("tailwindcss/defaultTheme")
-
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  plugins: [require("daisyui"), nextui()],
-  daisyui: {
-    themes: false, // false: only light + dark | true: all themes | array: specific themes like this ["light", "dark", "cupcake"]
-    darkTheme: "dark", // name of one of the included themes for dark mode
-    base: true, // applies background color and foreground color for root element by default
-    styled: true, // include daisyUI colors and design decisions for all components
-    utils: true, // adds responsive and modifier utility classes
-    prefix: "", // prefix for daisyUI classnames (components, modifiers and responsive class names. Not colors)
-    logs: true, // Shows info about daisyUI version and used config in the console when building your CSS
-    themeRoot: ":root", // The element that receives theme color CSS variables
-  },
+  plugins: [
+    require("daisyui"),
+    nextui({
+      themes: {
+        light: {
+          colors: {
+            primary: {
+              DEFAULT: "#BEF264",
+              foreground: "#000000",
+            },
+            focus: "#BEF264",
+          },
+        },
+      },
+    }),
+  ],
   darkMode: "class",
   content: [
     "./index.html",
@@ -27,30 +31,6 @@ module.exports = {
   ],
   theme: {
     extend: {
-      colors: {
-        theme: "#1C2331",
-        contentbg: "#20262F",
-        whitesmoke: "#f5f5f5",
-        dimgray: {
-          "100": "#525252",
-          "200": "rgba(82, 91, 112, 0.2)",
-        },
-        gainsboro: {
-          "100": "#dbdbdb",
-          "200": "rgba(230, 230, 230, 0.1)",
-          "300": "rgba(230, 230, 230, 0.5)",
-          "400": "rgba(230, 230, 230, 0.09)",
-        },
-        crimson: {
-          "100": "#fc266e",
-          "200": "#d70147",
-          "300": "rgba(252, 38, 110, 0.09)",
-        },
-        darkslategray: {
-          "100": "#323232",
-          "200": "#242d3c",
-        },
-      },
       fontFamily: {
         body: [
           "Inter",
@@ -101,9 +81,9 @@ module.exports = {
       },
       minWidth: {
         ...defaultTheme.width,
-      },      
+      },
     },
-       screens: {
+    screens: {
       lg: {
         max: "1200px",
       },

@@ -2,13 +2,10 @@ import { Avatar } from "@nextui-org/react"
 import Link from "next/link"
 import React, { ChangeEvent, useState } from "react"
 import colors from "tailwindcss/colors"
-import { ROLE_ACCOUNT } from "@models/common"
 import { useBoundStore } from "@zustand/total"
-import CustomButton from "../../../common/CustomButton"
 import { useRouter } from "next/router"
-// const colors = require("tailwindcss/colors")
-
-
+import { ROLE_ACCOUNT } from "@models/user"
+import { CustomButton } from "@components/common/CustomButton"
 
 const DropDownMenu = () => {
   const { accountInfo, removeAccountInfo, removeAuthInfo } = useBoundStore((store) => ({
@@ -22,48 +19,43 @@ const DropDownMenu = () => {
   const onLogout = () => {
     removeAccountInfo()
     removeAuthInfo()
-    route.push('/')
+    route.push("/")
   }
 
   return (
-    <div className="z-[999] h-fit w-52 rounded-lg bg-gray-900 text-white">
+    <div className="z-[999] h-fit w-52 rounded-lg bg-white text-black">
       <div className="p-8 text-center">
-        <p className="my-2 font-medium">{accountInfo.username}</p>
-
         <div className="flex flex-col items-center gap-1 text-center text-sm font-normal text-gray-400">
-          <Avatar />
-          In-game Name
+          {accountInfo?.image ? (
+            <Avatar size="sm" src={accountInfo?.image} isBordered color="success" />
+          ) : (
+            <Avatar size="sm" name={accountInfo?.name} isBordered color="success" />
+          )}
         </div>
+        <p className="my-2 font-medium">{accountInfo?.name}</p>
       </div>
       <div className="flex flex-col gap-4 border-t border-gray-300 p-4">
-        {accountInfo.role === "customer" && (
+        {accountInfo?.role === ROLE_ACCOUNT.USER && (
           <div>
-            <div className="hover cursor-pointer rounded-md px-4 py-2 hover:bg-white hover:text-black">
-              <Link href={"/my-jobs"}>My Jobs</Link>
+            <div className="hover cursor-pointer rounded-md border-b-1 px-4 py-2 hover:bg-white hover:text-black">
+              <Link href={"/profile/purchased-books"}>Sách đã mua</Link>
             </div>
-            <div className="hover mb-2 cursor-pointer rounded-md px-4 py-2 hover:bg-white hover:text-black">
-              <Link href={"/edit-profile"}>Edit Profile</Link>
+            <div className="hover mb-2 cursor-pointer rounded-md border-b-1 px-4 py-2 hover:bg-white hover:text-black">
+              <Link href={"/profile/my-account"}>Thông tin tài khoản</Link>
             </div>
-            <hr
-              style={{
-                borderColor: colors.gray[100],
-                height: "0.5px",
-              }}
-            />
-            <div className="hover mt-2 cursor-pointer rounded-md px-4 py-2 hover:bg-white hover:text-black">
-              <Link href={"/messages"}>Messages</Link>
+            <div className="hover mb-2 cursor-pointer rounded-md border-b-1 px-4 py-2 hover:bg-white hover:text-black">
+              <Link href={"/profile/change-password"}>Đổi mật khẩu</Link>
             </div>
-            <div className="hover mt-2 cursor-pointer rounded-md px-4 py-2 hover:bg-white hover:text-black">
-              <Link href="/payment-account">Payment Information</Link>
-            </div>
-            <div className="hover mt-2 cursor-pointer rounded-md px-4 py-2 hover:bg-white hover:text-black">
-              <Link href="/change-password">Change Password</Link>
+            <div className="hover mb-2 cursor-pointer rounded-md border-b-1 px-4 py-2 hover:bg-white hover:text-black">
+              <Link href={"/profile/purchase-history"}>Lịch sự mua hàng</Link>
             </div>
           </div>
         )}
 
         <br />
-        <CustomButton label="Log out" onClick={onLogout} customClassName="bg-red-500 hover:bg-red-600" />
+        <CustomButton onClick={onLogout} color="green">
+          Đăng xuất
+        </CustomButton>
       </div>
     </div>
   )

@@ -8,19 +8,13 @@ export interface AuthInfoSlice {
 }
 
 export const createAuthInfoSlice: StateCreator<AuthInfoSlice, [], [], AuthInfoSlice> = (set) => ({
-  authInfo: {
-    accessToken: null,
-    refreshToken: null,
-  },
+  authInfo: {},
   saveAuthInfo: (payload: AuthInfo) =>
     set(() => ({
       authInfo: payload,
     })),
   removeAuthInfo: () =>
     set(() => ({
-      authInfo: {
-        accessToken: null,
-        refreshToken: null,
-      },
+      authInfo: {},
     })),
 })

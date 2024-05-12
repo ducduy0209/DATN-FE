@@ -6,6 +6,10 @@ import { env } from "./env.mjs"
  * @type {import('next').NextConfig}
  */
 const config = withPlugins([[withBundleAnalyzer({ enabled: env.ANALYZE })]], {
+  webpack: (config) => {
+    config.resolve.alias.canvas = false
+    return config
+  },
   reactStrictMode: true,
   experimental: { instrumentationHook: true },
   rewrites() {
@@ -16,7 +20,7 @@ const config = withPlugins([[withBundleAnalyzer({ enabled: env.ANALYZE })]], {
       { source: "/ping", destination: "/api/health" },
     ]
   },
-  transpilePackages: ['lucide-react']
+  transpilePackages: ["lucide-react"],
 })
 
 export default config

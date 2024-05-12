@@ -42,10 +42,10 @@ const Header = () => {
   return (
     <div
       className={`sticky top-0 z-[999] h-10 ${
-        isTransParent ? "bg-black/30 backdrop-blur-lg" : "bg-theme shadow-lg"
-      } z-99 flex w-screen items-center justify-between p-8 text-slate-900`}
+        isTransParent ? "bg-white/30 backdrop-blur-lg" : "bg-white shadow-lg"
+      } z-99 flex w-screen items-center justify-between px-40 py-8 text-slate-900`}
     >
-      <div className="logo-block flex items-center gap-8">
+      <div className="logo-block flex items-center gap-2">
         <div className="logo">
           <Link href="/">
             <Image width={50} height={50} alt="logo" src="/images/logo.png"></Image>
@@ -54,9 +54,8 @@ const Header = () => {
         <div className="main-container">
           <Link href="/">
             <p className="text-xl font-bold">
-              <span className="text-white">BOOSTERA</span>
+              <span className="text-green-400">MERCHIZE BOOK STORE</span>
             </p>
-            <span className="font-bold text-red-500">LOL ELO BOOST</span>
           </Link>
         </div>
       </div>

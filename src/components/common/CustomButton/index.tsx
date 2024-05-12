@@ -1,37 +1,29 @@
-import { memo } from 'react'
-import SpinnerLoading from '../SpinnerLoading'
+// MyButton.tsx
+import { extendVariants, Button } from "@nextui-org/react"
 
-type Props = {
-  customClassName?: string
-  label: string
-  labelDisable?: string
-  isLoading?: boolean
-  isDisable?: boolean
-  onClick?: () => void
-}
-
-const CustomButton = ({ customClassName, label, labelDisable = "Loading...", isLoading = false, isDisable = false, onClick }: Props) => {
-  // const handleClick = () => {
-  //   if (!isDisable && !isLoading && typeof onClick === "function") {
-  //     onClick()
-  //   }
-  // }
-  return (
-    <button
-      disabled={isDisable}
-      className={`px-4 py-2 bg-primary-400 text-white text-sm rounded-lg transition-all delay-[30ms] w-full ${isDisable ? 'cursor-not-allowed opacity-80' : 'hover:bg-primary-300'} ${customClassName}`}
-      onClick={onClick}
-    >
-      {!isLoading ? label :
-        <div className="flex items-center justify-center">
-          <SpinnerLoading
-            size={4}
-          />
-          <span>{labelDisable}</span>
-        </div>
-      }
-    </button>
-  )
-}
-
-export default memo(CustomButton)
+export const CustomButton = extendVariants(Button, {
+  variants: {
+    color: {
+      olive: "text-[#000] bg-[#84cc16]",
+      orange: "bg-[#ff8c00] text-[#fff]",
+      violet: "bg-[#8b5cf6] text-[#fff]",
+      green: "text-white bg-green-400",
+    },
+    isDisabled: {
+      true: "opacity-50 cursor-not-allowed",
+    },
+    isGhost: {
+      true: "text-green-400 border-2 border-green-400 bg-white hover:text-white hover:bg-green-400",
+    },
+    size: {
+      xs: "px-2 min-w-12 h-6 text-tiny gap-1 rounded-small",
+      md: "px-4 min-w-20 h-10 text-small gap-2 rounded-small font-semibold",
+      xl: "px-8 min-w-28 h-14 text-large gap-4 rounded-medium font-semibold",
+    },
+  },
+  defaultVariants: {
+    // <- modify/add default variants
+    color: "green",
+    size: "md",
+  },
+})
