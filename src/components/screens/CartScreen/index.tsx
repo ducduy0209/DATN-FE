@@ -32,6 +32,7 @@ const CartScreen = () => {
         duration,
       }),
     })
+    setIsStaleData(!isStaleData)
   }
 
   const handleDeleteCart = async (cartId: string) => {

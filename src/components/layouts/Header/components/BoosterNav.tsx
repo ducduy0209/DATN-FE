@@ -1,30 +1,52 @@
-import { Avatar } from "@nextui-org/react"
+import { Avatar, Chip } from "@nextui-org/react"
 import Link from "next/link"
-import React, { useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { useClickOutside } from "@hooks/useClickOutside"
 import { useBoundStore } from "@zustand/total"
 import DropDownMenu from "./DropDownMenu"
 import { CustomButton } from "@components/common/CustomButton"
+import { API_ENDPOINT } from "@models/api"
+import { Response } from "@models/api"
+import { Cart } from "@models/cart"
+
 const BoosterNav = () => {
   const [isOpenDropDownMenu, setIsOpenDropDownMenu] = useState<boolean>(false)
   const toggleRef = useRef<HTMLDivElement>(null)
   const dropDownRef = useRef<HTMLDivElement>(null)
   useClickOutside(dropDownRef, toggleRef, () => setIsOpenDropDownMenu(false))
+  const [quantity, setQuantity] = useState<number>(0)
 
   const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
     event.stopPropagation()
     setIsOpenDropDownMenu((prev) => !prev)
   }
 
-  const { accountInfo, removeAccountInfo } = useBoundStore((store) => ({
+  const { accountInfo, authInfo } = useBoundStore((store) => ({
     accountInfo: store.accountInfo,
-    removeAccountInfo: store.removeAccountInfo,
+    authInfo: store.authInfo,
   }))
+
+  const handleGetCart = async () => {
+    const response = await fetch(API_ENDPOINT + "/carts", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authInfo.access?.token}`,
+      },
+    })
+    const raw = (await response.json()) as Response<Cart[]>
+    if (raw.data) {
+      setQuantity(raw.data.length)
+    }
+  }
+
+  useEffect(() => {
+    handleGetCart()
+  }, [])
 
   return (
     <div className="flex items-center gap-4 font-semibold">
       <Link href="/cart">
-        <CustomButton>Giỏ Sách</CustomButton>
+        <CustomButton endContent={quantity !== 0 ? <Chip>{quantity}</Chip> : ""}>Giỏ Sách</CustomButton>
       </Link>
       <div className="relative" ref={toggleRef} onMouseDown={handleMouseDown}>
         <div className="bg-green flex cursor-pointer items-center gap-2 rounded-xl border px-4 py-1 text-sm font-semibold text-black transition-all delay-75 hover:border-white hover:bg-green-400 hover:text-white">
