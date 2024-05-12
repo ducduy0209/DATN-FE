@@ -39,7 +39,9 @@ const CartItem = ({ book, handleUpdateCart, handleDeleteCart }: Props) => {
         </div>
         <div className="flex gap-4">
           <p>Thành tiền: </p>
-          <p className="text-xl font-semibold text-red-400">{formatCurrency(book.price.toString())}</p>
+          <p className="text-xl font-semibold text-red-400">
+            {formatCurrency(book.book_id.prices.find((item) => item.duration === book.duration)?.price.toString())}
+          </p>
         </div>
       </div>
       <div>

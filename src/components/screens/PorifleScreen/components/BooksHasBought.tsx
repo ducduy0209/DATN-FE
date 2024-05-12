@@ -3,14 +3,24 @@ import React, { useEffect, useState } from "react"
 import { Book } from "@models/book"
 import { API_ENDPOINT, DataWithPagination, Response } from "@models/api"
 import RateStar from "@components/common/RateStar"
+import { useBoundStore } from "@zustand/total"
 
 const BooksHasBought = () => {
   const [books, setBooks] = useState<DataWithPagination<Book[]>>()
   const [page, setPage] = useState<number>(1)
+  const { authInfo } = useBoundStore((state) => ({
+    authInfo: state.authInfo,
+  }))
 
   useEffect(() => {
     const handleFetchBooks = async () => {
-      const response = await fetch(API_ENDPOINT + `/users/my-books?page=${page}`)
+      const token = "Bearer " + authInfo.access
+      const response = await fetch(API_ENDPOINT + `/users/my-books?page=${page}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      })
       const raw = (await response.json()) as Response<DataWithPagination<Book[]>>
       if (raw.data) {
         setBooks(raw.data)

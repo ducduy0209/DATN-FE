@@ -77,7 +77,7 @@ const CartScreen = () => {
     let price = 0
     if (cart?.length) {
       cart.map((item) => {
-        price += item.price
+        price += item.book_id.prices.find((price) => price.duration === item.duration)?.price ?? 0
       })
     }
     setTotalPrice(price)
