@@ -76,7 +76,7 @@ const PurchaseHistory = () => {
             {(item) => (
               <TableRow key={item.id}>
                 <TableCell>
-                  <Link href={`/book/${item.book_id.slug}`}>{item.book_id.title}</Link>
+                  <Link href={`/book/${item.book_id?.slug}`}>{item.book_id?.title}</Link>
                 </TableCell>
                 <TableCell>{moment(item.borrow_date).format("L")}</TableCell>
                 <TableCell>{moment(item.due_date).format("L")}</TableCell>

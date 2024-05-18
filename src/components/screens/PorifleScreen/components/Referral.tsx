@@ -1,6 +1,7 @@
 import {
   Chip,
   Pagination,
+  Spinner,
   Table,
   TableBody,
   TableCell,
@@ -21,26 +22,41 @@ import Link from "next/link"
 
 const columns = [
   {
-    key: "title",
-    label: "Tên sách",
+    key: "refer_code",
+    label: "Mã tiếp thị",
   },
   {
-    key: "borrow_date",
-    label: "Ngày mượn",
+    key: "link_count",
+    label: "Số lần truy cập",
   },
   {
-    key: "due_date",
-    label: "Ngày hết hạn",
+    key: "purchase_count",
+    label: "Số lần tiếp thị thành công",
   },
   {
-    key: "duration",
-    label: "Thời hạn",
+    key: "commission_paid",
+    label: "Tiền hoa hồng đã nhận",
   },
   {
-    key: "isExpired",
-    label: "Tình trạng",
+    key: "commission_amount",
+    label: "Tổng số tiền hoa hồng",
   },
 ]
+
+type Referral = {
+  link_count: number
+  purchase_count: number
+  commission_amount: number
+  commission_paid: number
+  commission_percent: number
+  isUpdatedReceiver: boolean
+  _id: string
+  user_id: string
+  refer_code: string
+  email_receiver: string
+  commission_remaining: number
+  id: string
+}
 
 const Referral = () => {
   const route = useRouter()
@@ -48,21 +64,24 @@ const Referral = () => {
     authInfo: state.authInfo,
   }))
 
-  const [borrows, setBorrows] = useState<DataWithPagination<Borrow[]>>()
+  const [referrals, setReferrals] = useState<DataWithPagination<Referral[]>>()
   const [page, setPage] = useState<number>(1)
 
   useEffect(() => {
-    const handleFetchBorrows = async () => {
-      const response = await fetch(API_ENDPOINT + `/borrow-records?page=${page}`, {
+    const handleFetchReferrals = async () => {
+      const response = await fetch(API_ENDPOINT + `/affiliates`, {
         headers: { "Content-Type": "application/json", authorization: `Bearer ${authInfo.access?.token}` },
       })
       const data = (await response.json()) as Response<any>
-      if (data?.data?.result) {
-        setBorrows(data.data.result)
+      console.log(data)
+      if (data?.data?.results) {
+        setReferrals(data.data)
       }
     }
-    handleFetchBorrows()
+    handleFetchReferrals()
   }, [page])
+
+  console.log(referrals)
 
   return (
     <div className="px-12 py-10">
@@ -71,38 +90,28 @@ const Referral = () => {
         <TableHeader columns={columns}>
           {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
         </TableHeader>
-        {borrows?.results ? (
-          <TableBody items={borrows?.results}>
+        {referrals?.results ? (
+          <TableBody items={referrals?.results}>
             {(item) => (
               <TableRow key={item.id}>
-                <TableCell>
-                  <Link href={`/book/${item.book_id.slug}`}>{item.book_id.title}</Link>
-                </TableCell>
-                <TableCell>{moment(item.borrow_date).format("L")}</TableCell>
-                <TableCell>{moment(item.due_date).format("L")}</TableCell>
-                <TableCell>{item.duration}</TableCell>
-                <TableCell>
-                  {item.isExpired ? (
-                    <Chip color="danger">Đã hết hạn</Chip>
-                  ) : (
-                    <Chip color="success" className="text-white">
-                      Chưa hết hạn
-                    </Chip>
-                  )}
-                </TableCell>
+                <TableCell>{item.refer_code}</TableCell>
+                <TableCell>{item.link_count}</TableCell>
+                <TableCell>{item.purchase_count}</TableCell>
+                <TableCell>${item.commission_paid}</TableCell>
+                <TableCell>${item.commission_amount}</TableCell>
               </TableRow>
             )}
           </TableBody>
         ) : (
-          <TableBody emptyContent={"Bạn chưa có lịch sử mượn sách."}>{[]}</TableBody>
+          <TableBody emptyContent={<Spinner />}>{[]}</TableBody>
         )}
       </Table>
-      {borrows?.totalPages && borrows.totalPages > 1 ? (
+      {referrals?.totalPages && referrals.totalPages > 1 ? (
         <Pagination
           color="success"
           className="mt-4"
           showControls
-          total={borrows.totalPages}
+          total={referrals.totalPages}
           initialPage={page}
           onChange={(pageChanged: number) => setPage(pageChanged)}
         />

@@ -36,21 +36,36 @@ const DropDownMenu = () => {
       </div>
       <div className="flex flex-col gap-4 border-t border-gray-300 p-4">
         <div>
-          <div className="hover cursor-pointer rounded-md border-b-1 px-4 py-2 hover:bg-white hover:text-black">
-            <Link href={"/profile/purchased-books"}>Sách đã mua</Link>
-          </div>
-          <div className="hover mb-2 cursor-pointer rounded-md border-b-1 px-4 py-2 hover:bg-white hover:text-black">
-            <Link href={"/profile/my-account"}>Thông tin tài khoản</Link>
-          </div>
-          <div className="hover mb-2 cursor-pointer rounded-md border-b-1 px-4 py-2 hover:bg-white hover:text-black">
-            <Link href={"/profile/change-password"}>Đổi mật khẩu</Link>
-          </div>
-          <div className="hover mb-2 cursor-pointer rounded-md border-b-1 px-4 py-2 hover:bg-white hover:text-black">
-            <Link href={"/profile/purchase-history"}>Lịch sự mua hàng</Link>
-          </div>
-          <div className="hover mb-2 cursor-pointer rounded-md border-b-1 px-4 py-2 hover:bg-white hover:text-black">
-            <Link href={"/profile/referral"}>Tiếp thị liên kết</Link>
-          </div>
+          <Link
+            className="hover cursor-pointer rounded-md border-b-1 px-4 py-2 hover:bg-white hover:text-black"
+            href={"/profile/purchased-books"}
+          >
+            <p>Sách đã mua</p>
+          </Link>
+          <Link
+            href={"/profile/my-account"}
+            className="hover mb-2 cursor-pointer rounded-md border-b-1 px-4 py-2 hover:bg-white hover:text-black"
+          >
+            <p>Thông tin tài khoản</p>
+          </Link>
+          <Link
+            href={"/profile/change-password"}
+            className="hover mb-2 cursor-pointer rounded-md border-b-1 px-4 py-2 hover:bg-white hover:text-black"
+          >
+            <p>Đổi mật khẩu</p>
+          </Link>
+          <Link
+            href={"/profile/purchase-history"}
+            className="hover mb-2 cursor-pointer rounded-md border-b-1 px-4 py-2 hover:bg-white hover:text-black"
+          >
+            <p>Lịch sự mua hàng</p>
+          </Link>
+          <Link
+            href={"/profile/referral"}
+            className="hover mb-2 cursor-pointer rounded-md border-b-1 px-4 py-2 hover:bg-white hover:text-black"
+          >
+            <div>Tiếp thị liên kết</div>
+          </Link>
         </div>
 
         <br />

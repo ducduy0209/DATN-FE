@@ -1,9 +1,51 @@
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Image, Pagination } from "@nextui-org/react"
+import {
+  Button,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+  Image,
+  Pagination,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+} from "@nextui-org/react"
 import React, { useEffect, useState } from "react"
 import { Book } from "@models/book"
 import { API_ENDPOINT, DataWithPagination, Response } from "@models/api"
 import RateStar from "@components/common/RateStar"
 import { useBoundStore } from "@zustand/total"
+import Link from "next/link"
+import moment from "moment"
+import { CustomButton } from "@components/common/CustomButton"
+import ReadBook from "@components/common/ReadBook"
+
+type BookResponse = {
+  books: DataWithPagination<Book[]>
+  status: string
+}
+
+const columns = [
+  {
+    key: "title",
+    label: "Tên sách",
+  },
+  {
+    key: "author",
+    label: "Tác giả",
+  },
+  {
+    key: "rating",
+    label: "Đánh giá",
+  },
+  {
+    key: "action",
+    label: "Đọc sách",
+  },
+]
 
 const BooksHasBought = () => {
   const [books, setBooks] = useState<DataWithPagination<Book[]>>()
@@ -11,6 +53,7 @@ const BooksHasBought = () => {
   const { authInfo } = useBoundStore((state) => ({
     authInfo: state.authInfo,
   }))
+  const [bookRead, setBookRead] = useState<string>("")
 
   useEffect(() => {
     const handleFetchBooks = async () => {
@@ -21,9 +64,9 @@ const BooksHasBought = () => {
           Authorization: token,
         },
       })
-      const raw = (await response.json()) as Response<DataWithPagination<Book[]>>
-      if (raw.data) {
-        setBooks(raw.data)
+      const raw = (await response.json()) as BookResponse
+      if (raw.status === "success") {
+        setBooks(raw.books)
       }
     }
     handleFetchBooks()
@@ -31,6 +74,7 @@ const BooksHasBought = () => {
 
   return (
     <div>
+      {bookRead && <ReadBook bookId={bookRead} />}
       <div className="flex items-center justify-between border-b-1 px-10 py-6">
         <p className="font-semibold">Sách bạn đã mua</p>
         <Dropdown>
@@ -46,24 +90,31 @@ const BooksHasBought = () => {
         </Dropdown>
       </div>
       <div className="px-10">
-        <div className="flex flex-wrap gap-4">
-          {books?.results.length ? (
-            books.results.map((book) => (
-              <div key={book.title} className="flex w-[220px] justify-center text-center">
-                <div className="flex w-[200px] flex-col gap-2">
-                  <Image src={book.cover_image} alt={book.title} />
-                  <p className="line-clamp-3 text-black">{book.title}</p>
-                  <RateStar rate={book.rating} />
-                  <p className="uppercase text-black">{book.author}</p>
-                </div>
-              </div>
-            ))
+        <Table aria-label="Example table with dynamic content">
+          <TableHeader columns={columns}>
+            {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
+          </TableHeader>
+          {books?.results ? (
+            <TableBody items={books?.results}>
+              {(item) => (
+                <TableRow key={item.id}>
+                  <TableCell>
+                    <Link href={`/book/${item?.slug}`}>{item?.title}</Link>
+                  </TableCell>
+                  <TableCell>{item.author}</TableCell>
+                  <TableCell>
+                    <RateStar rate={item.rating} />
+                  </TableCell>
+                  <TableCell>
+                    <CustomButton onClick={() => setBookRead(item.id)}>Đọc sách</CustomButton>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
           ) : (
-            <div className="mt-4 w-full text-center font-semibold">
-              Bạn chưa có sách nào. Hãy khám phá kho sách của chúng tôi.
-            </div>
+            <TableBody emptyContent={"Bạn chưa có lịch sử mượn sách."}>{[]}</TableBody>
           )}
-        </div>
+        </Table>
         {books?.totalPages && books.totalPages > 1 ? (
           <Pagination
             color="success"

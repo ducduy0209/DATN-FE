@@ -108,7 +108,12 @@ const DocumentCategory = () => {
           onChange={handleChangeSearch}
           ref={searchRef}
         />
-        <CustomButton startContent={<Icon name="book-open-check" />}>Sách của tôi</CustomButton>
+        <CustomButton
+          startContent={<Icon name="book-open-check" />}
+          onClick={() => route.push("/profile/purchased-books")}
+        >
+          Sách của tôi
+        </CustomButton>
       </div>
       <div className="flex bg-green-400 px-40">
         <div className="relative h-[428px] w-72 bg-white">

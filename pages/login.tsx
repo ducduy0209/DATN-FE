@@ -10,6 +10,7 @@ import { useBoundStore } from "@zustand/total"
 import { Image } from "@nextui-org/react"
 import { CustomButton } from "@components/common/CustomButton"
 import { AccountInfo, ROLE_ACCOUNT } from "@models/user"
+import { v4 as uuidv4 } from "uuid"
 
 type LoginInfo = {
   email: string
@@ -93,29 +94,12 @@ const Login = () => {
           notify(NOTIFICATION_TYPE.SUCCESS, "Login successfully!")
         }, 50)
       } else {
-        notify(NOTIFICATION_TYPE.ERROR, !!data.message ? data.message : "Something wrong with server, try again!")
+        notify(NOTIFICATION_TYPE.ERROR, !!data.message ? data.message : "Something wrong with server, try again!", {
+          toastId: uuidv4(),
+        })
       }
     }
   }
-
-  useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.addEventListener("keypress", (e: any) => {
-        if (e.key === "Enter") {
-          e.preventDefault()
-          onLogin()
-        }
-      })
-    }
-    return () => {
-      inputRef.current?.removeEventListener("keypress", (e: any) => {
-        if (e.key === "Enter") {
-          e.preventDefault()
-          onLogin()
-        }
-      })
-    }
-  }, [])
 
   return (
     <div className="bg-theme hero min-h-screen">

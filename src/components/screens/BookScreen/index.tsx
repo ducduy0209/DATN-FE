@@ -29,6 +29,7 @@ import BookType from "@components/common/BookType"
 import PdfViewer from "@components/common/PdfViewer"
 import copy from "copy-to-clipboard"
 import { useRouter } from "next/router"
+import { useSearchParams } from "next/navigation"
 
 type Props = {
   id: string
@@ -36,7 +37,7 @@ type Props = {
 const settings = {
   dots: false,
   infinite: true,
-  slidesToShow: 3,
+  slidesToShow: 1,
   slidesToScroll: 1,
   vertical: true,
   verticalSwiping: true,
@@ -75,8 +76,10 @@ const BookScreen = ({ id }: Props) => {
   const [pdfBuffer, setPdfBuffer] = useState<ArrayBuffer>()
   const { isOpen, onOpen, onOpenChange } = useDisclosure()
   const route = useRouter()
+  const searchParams = useSearchParams()
 
   const handleAddToCart = async (isBuyNow: boolean = false) => {
+    const refer_code = searchParams.get("refer_code")
     const priceCalculated = book?.prices.find((price) => price.duration === duration)?.price
     const response = await fetch(API_ENDPOINT + "/carts", {
       method: "POST",
@@ -88,6 +91,7 @@ const BookScreen = ({ id }: Props) => {
         book_id: book?.id,
         duration: duration,
         price: priceCalculated,
+        refer_code,
       }),
     })
     const raw = (await response.json()) as Response<null>
@@ -185,29 +189,20 @@ const BookScreen = ({ id }: Props) => {
       )}
       <p>Trang chủ / {book?.title}</p>
       <div className="my-8 flex gap-8 rounded-lg bg-white p-8">
-        <div className="slider-container flex w-[140px] flex-col items-center rounded-lg bg-gray-100">
-          <Icon name="chevron-up" onClick={prev} />
-          <Slider {...settings} className="mx-auto flex" ref={sliderRef}>
-            {MOCK_BOOK.images.map((image) => (
-              <div
-                key={image}
-                onClick={() => setSelectImage(image)}
-                className="ml-[25%] w-full justify-center"
-                style={{ display: "flex !important" }}
-              >
-                <Image src={image} width={60} className="rounded-none" />
-              </div>
-            ))}
-          </Slider>
-          <Icon name="chevron-down" onClick={next} />
+        <div className="slider-container flex h-fit w-[140px] flex-col items-center rounded-lg bg-gray-100">
+          <Icon name="chevron-up" />
+          <div key={book?.cover_image} className="flex w-full justify-center" style={{ display: "flex !important" }}>
+            <Image src={`http://localhost:3000/img/books/${book?.cover_image}`} width={60} className="rounded-none" />
+          </div>
+          <Icon name="chevron-down" />
         </div>
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex flex-col items-center gap-12">
           <Image src={`http://localhost:3000/img/books/${selectImage}`} width={200} className="rounded-none" />
           <CustomButton color="default" onClick={onOpen}>
             Preview
           </CustomButton>
         </div>
-        <div>
+        <div className="w-[80%]">
           <p className="text-lg font-semibold">{book?.title}</p>
           <div className="my-4 flex gap-8">
             <div className="flex items-center gap-1 border-r-2 px-2">
@@ -229,12 +224,12 @@ const BookScreen = ({ id }: Props) => {
               <Icon name="share" width={20} />
             </div>
           </div>
-          <div className="rounded-lg bg-gray-100 p-8">
+          <div className="w-full rounded-lg bg-gray-100 p-8">
             <p className="pb-4 text-lg font-semibold">Chọn sản phẩm</p>
             <div className="flex items-center gap-4 rounded-lg bg-white p-4">
               <Dropdown>
                 <DropdownTrigger>
-                  <Button variant="bordered">
+                  <Button variant="bordered" endContent={<Icon name="chevron-down" />}>
                     {duration === "forever" ? "Vĩnh viễn" : duration.split(" ")[0] + " tháng"}
                   </Button>
                 </DropdownTrigger>

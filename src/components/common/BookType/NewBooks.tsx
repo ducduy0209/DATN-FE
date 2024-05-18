@@ -59,7 +59,7 @@ const NewBooks = () => {
         {books.map((book) => (
           <div
             key={book.title}
-            className="flex w-[220px] justify-center text-center"
+            className="flex w-[220px] cursor-pointer justify-center text-center"
             onClick={() => route.push(`/book/${book.slug}`)}
           >
             <div className="flex w-[200px] flex-col items-center gap-2">

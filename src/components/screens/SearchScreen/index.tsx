@@ -205,11 +205,15 @@ const SearchScreen = () => {
               books.results.map((book) => (
                 <div
                   key={book.title}
-                  className="flex h-[300px] w-[220px] justify-center rounded-xl bg-gray-200 py-2 text-center"
-                  onClick={() => route.push(`book/${book.slug}`)}
+                  className="flex w-[220px] cursor-pointer justify-center rounded-xl bg-gray-200 py-2 text-center"
+                  onClick={() => route.push(`/book/${book.slug}`)}
                 >
-                  <div className="flex w-[200px] flex-col gap-2">
-                    <Image src={book.cover_image} alt={book.title} />
+                  <div className="flex w-[200px] flex-col items-center gap-2">
+                    <Image
+                      className="h-[200px]"
+                      src={`http://localhost:3000/img/books/${book?.cover_image}`}
+                      alt={book.title}
+                    />
                     <p className="line-clamp-3 text-black">{book.title}</p>
                     <RateStar rate={book.rating} />
                     <p className="uppercase text-black">{book.author}</p>

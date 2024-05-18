@@ -1,5 +1,5 @@
 import { CustomButton } from "@components/common/CustomButton"
-import { Input } from "@nextui-org/react"
+import { Button, Input } from "@nextui-org/react"
 import { formatCurrency } from "@utils/formatCurrency"
 import React, { useEffect, useState } from "react"
 import CartItem from "./components/CartItem"
@@ -10,6 +10,7 @@ import { Response } from "@models/api"
 import BookType from "@components/common/BookType"
 import { duration } from "moment"
 import { useRouter } from "next/router"
+import { NOTIFICATION_TYPE, notify } from "@utils/notify"
 
 const CartScreen = () => {
   const [cart, setCart] = useState<Cart[]>()
@@ -18,6 +19,7 @@ const CartScreen = () => {
   }))
   const [totalPrice, setTotalPrice] = useState<number>(0)
   const [discount, setDiscount] = useState<number>(0)
+  const [coupon, setCoupon] = useState<string>("")
   const [isStaleData, setIsStaleData] = useState<boolean>(false)
   const route = useRouter()
 
@@ -51,9 +53,9 @@ const CartScreen = () => {
       return {
         bookId: book.book_id.id,
         duration: book.duration,
-        price: book.price,
+        price: totalPrice - discount,
         referCode: book.refer_code,
-        couponCode: discount,
+        couponCode: coupon,
       }
     })
     const response = await fetch(API_ENDPOINT + `/books/checkout`, {
@@ -67,7 +69,6 @@ const CartScreen = () => {
       }),
     })
     const raw = (await response.json()) as any
-    console.log(raw)
     if (raw.status === "success") {
       route.push(raw.link)
     }
@@ -99,6 +100,30 @@ const CartScreen = () => {
   useEffect(() => {
     handleGetCart()
   }, [isStaleData])
+
+  const handleApplyCoupon = async () => {
+    const response = await fetch(API_ENDPOINT + "/coupons/apply", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authInfo.access?.token}`,
+      },
+      body: JSON.stringify({
+        price: totalPrice,
+        code: coupon,
+      }),
+    })
+    const raw = (await response.json()) as Response<{ price: number; priceAfterSale: number }>
+    if (response.status === 200) {
+      notify(NOTIFICATION_TYPE.SUCCESS, "Áp dụng mã giảm giá thành công")
+      if (raw.data?.priceAfterSale) {
+        setDiscount(totalPrice - raw.data.priceAfterSale)
+      }
+    } else {
+      setDiscount(0)
+      notify(NOTIFICATION_TYPE.ERROR, raw.message ? raw.message : "Mã giảm giá không hợp lệ.")
+    }
+  }
 
   return (
     <div>
@@ -132,7 +157,7 @@ const CartScreen = () => {
               </div>
               <div className="flex justify-between">
                 <p className="font-semibold">Giảm giá: </p>
-                <p className="text-green-400">-{formatCurrency("0")}</p>
+                <p className="text-green-400">-{formatCurrency(discount.toString())}</p>
               </div>
               <div className="flex justify-between">
                 <p className="font-semibold">Thành tiền: </p>
@@ -140,7 +165,12 @@ const CartScreen = () => {
                   {formatCurrency((totalPrice - discount).toString())}
                 </p>
               </div>
-              <Input label="Mã giảm giá" />
+              <div className="flex items-center gap-2">
+                <Input label="Mã giảm giá" value={coupon} onChange={(e) => setCoupon(e.target.value)} />
+                <Button className="bg-green-500 text-white" isDisabled={!coupon} onClick={handleApplyCoupon}>
+                  Áp dụng
+                </Button>
+              </div>
               <CustomButton color="green" isDisabled={!totalPrice} onClick={handleCheckout}>
                 Tiến hành thanh toán
               </CustomButton>

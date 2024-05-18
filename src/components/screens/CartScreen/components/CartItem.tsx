@@ -13,7 +13,12 @@ type Props = {
 const CartItem = ({ book, handleUpdateCart, handleDeleteCart }: Props) => {
   return (
     <div className="flex gap-4 border-b-2 pb-4 pt-8">
-      <Image src={book.book_id.cover_image} width={200} alt={book.book_id.title} className="border-2" />
+      <Image
+        src={`http://localhost:3000/img/books/${book.book_id.cover_image}`}
+        width={200}
+        alt={book.book_id.title}
+        className="border-2"
+      />
       <div>
         <p>{book.book_id.title}</p>
         <div className="flex items-center gap-4">

@@ -81,7 +81,7 @@ const ResetPassword = () => {
               onChange={handleChangeInput}
             />
             {errorMessage && <span className="text-red-600">{errorMessage}</span>}
-            <CustomButton color="green" onClick={handleSubmit}>
+            <CustomButton color="green" onClick={handleSubmit} isDisabled={!route.query.token}>
               Xác nhận{" "}
             </CustomButton>
             <div className="flex justify-center gap-2">

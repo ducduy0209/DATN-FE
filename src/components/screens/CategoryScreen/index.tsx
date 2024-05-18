@@ -85,6 +85,9 @@ const CategoryScreen = ({ category }: Props) => {
     if (category) {
       const handleFetchBooks = async () => {
         let params = `/books/genres/${category}`
+        if (sortBy && sortType) {
+          params += `?sortBy=${sortBy}:${sortType}`
+        }
         const response = await fetch(API_ENDPOINT + params, {
           headers: { "Content-Type": "application/json" },
         })
@@ -96,7 +99,7 @@ const CategoryScreen = ({ category }: Props) => {
       }
       handleFetchBooks()
     }
-  }, [category])
+  }, [category, sortBy, sortType])
 
   useEffect(() => {
     const handleFetchCategorys = async () => {
@@ -112,7 +115,7 @@ const CategoryScreen = ({ category }: Props) => {
   }, [])
 
   return (
-    <div>
+    <div className="mb-20">
       <div className="bg-green-400 px-40 py-4">
         <Link href="/">Trang chủ</Link>
         <p className="text-lg font-semibold text-white">{categorySelected?.name}</p>
@@ -167,16 +170,20 @@ const CategoryScreen = ({ category }: Props) => {
               </DropdownMenu>
             </Dropdown>
           </div>
-          <div className="flex w-full flex-wrap justify-center gap-8 rounded-lg bg-white p-4 py-8">
+          <div className="flex h-full w-full flex-wrap justify-center gap-8 rounded-lg bg-white p-4 py-8">
             {books?.results.length ? (
               books.results.map((book) => (
                 <div
                   key={book.title}
-                  className="flex h-[300px] w-[220px] cursor-pointer justify-center rounded-xl bg-gray-200 py-2 text-center"
+                  className="flex w-[220px] cursor-pointer justify-center rounded-xl bg-gray-200 py-2 text-center"
                   onClick={() => route.push(`/book/${book.slug}`)}
                 >
-                  <div className="flex w-[200px] flex-col gap-2">
-                    <Image src={book.cover_image} alt={book.title} />
+                  <div className="flex w-[200px] flex-col items-center gap-2">
+                    <Image
+                      className="h-[200px]"
+                      src={`http://localhost:3000/img/books/${book?.cover_image}`}
+                      alt={book.title}
+                    />
                     <p className="line-clamp-3 text-black">{book.title}</p>
                     <RateStar rate={book.rating} />
                     <p className="uppercase text-black">{book.author}</p>
