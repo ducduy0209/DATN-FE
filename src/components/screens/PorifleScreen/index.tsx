@@ -10,6 +10,7 @@ import PurchaseHistory from "./components/PurchaseHistory"
 import Link from "next/link"
 import dynamic from "next/dynamic"
 import BookType from "@components/common/BookType"
+import Referral from "./components/Referral"
 
 const CustomerInformation = dynamic(() => import("./components/CustomerInformation").then((mod) => mod.default), {
   ssr: false,
@@ -20,6 +21,7 @@ export enum PROFILE_TYPE {
   CUSTOMER_INFORMATION,
   CHANGE_PASSWORD,
   HISTORY,
+  REFERRAL,
 }
 
 type Props = {
@@ -82,6 +84,13 @@ const ProfileScreen = ({ type }: Props) => {
               <Icon name="history" />
               <p>Lịch sự mua hàng</p>
             </Link>
+            <Link
+              href="/profile/referral"
+              className={`flex cursor-pointer items-center gap-1 border-b-2 py-2 ${type === PROFILE_TYPE.REFERRAL ? "textslate-900 font-semibold" : "text-slate-500"} hover:text-slate-900`}
+            >
+              <Icon name="history" />
+              <p>Tiếp thị liên kết</p>
+            </Link>
             <div
               className="flex cursor-pointer items-center gap-1 text-slate-500 hover:text-slate-900"
               onClick={onLogout}
@@ -96,6 +105,7 @@ const ProfileScreen = ({ type }: Props) => {
           {type === PROFILE_TYPE.CHANGE_PASSWORD && <ChangePassword />}
           {type === PROFILE_TYPE.CUSTOMER_INFORMATION && <CustomerInformation />}
           {type === PROFILE_TYPE.HISTORY && <PurchaseHistory />}
+          {type === PROFILE_TYPE.REFERRAL && <Referral />}
         </div>
       </div>
       <div className="px-40">

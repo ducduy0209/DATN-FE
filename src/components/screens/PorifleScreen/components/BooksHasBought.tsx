@@ -14,7 +14,7 @@ const BooksHasBought = () => {
 
   useEffect(() => {
     const handleFetchBooks = async () => {
-      const token = "Bearer " + authInfo.access
+      const token = "Bearer " + authInfo.access?.token
       const response = await fetch(API_ENDPOINT + `/users/my-books?page=${page}`, {
         headers: {
           "Content-Type": "application/json",

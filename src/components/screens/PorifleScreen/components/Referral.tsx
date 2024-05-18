@@ -42,7 +42,7 @@ const columns = [
   },
 ]
 
-const PurchaseHistory = () => {
+const Referral = () => {
   const route = useRouter()
   const { authInfo } = useBoundStore((state) => ({
     authInfo: state.authInfo,
@@ -66,7 +66,7 @@ const PurchaseHistory = () => {
 
   return (
     <div className="px-12 py-10">
-      <p className="mb-8 text-xl font-semibold">Lịch sử mượn sách</p>
+      <p className="mb-8 text-xl font-semibold">Tiếp thị liên kết của bạn</p>
       <Table aria-label="Example table with dynamic content">
         <TableHeader columns={columns}>
           {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
@@ -113,4 +113,4 @@ const PurchaseHistory = () => {
   )
 }
 
-export default PurchaseHistory
+export default Referral

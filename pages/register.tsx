@@ -56,7 +56,7 @@ const Register = () => {
       }, 500)
       saveAuthInfo(raw.data.tokens)
       saveAccountInfo(raw.data.user)
-      route.push(`/verify-account?token=${raw.data.tokens.access.token}`)
+      route.push(`/verify-account`)
     }
   }
 

@@ -1,7 +1,7 @@
 import { Button, Checkbox, Input } from "@nextui-org/react"
 import Link from "next/link"
 import { useRouter } from "next/router"
-import React, { ChangeEvent, useState } from "react"
+import React, { ChangeEvent, useEffect, useRef, useState } from "react"
 import CheckBox from "@components/common/CheckBox"
 import { API_ENDPOINT, Response } from "@models/api"
 import decodeJWT from "@utils/decodeJWT"
@@ -9,7 +9,7 @@ import { NOTIFICATION_TYPE, notify } from "@utils/notify"
 import { useBoundStore } from "@zustand/total"
 import { Image } from "@nextui-org/react"
 import { CustomButton } from "@components/common/CustomButton"
-import { AccountInfo } from "@models/user"
+import { AccountInfo, ROLE_ACCOUNT } from "@models/user"
 
 type LoginInfo = {
   email: string
@@ -21,6 +21,7 @@ const Login = () => {
     saveAuthInfo: store.saveAuthInfo,
     saveAccountInfo: store.saveAccountInfo,
   }))
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const route = useRouter()
 
@@ -76,15 +77,18 @@ const Login = () => {
         })
         saveAccountInfo({ ...data.data.user })
         //TODO: check gain
-        // if (data.data.user.isEmailVerified) {
-        //   saveAccountInfo({
-        //     ...data.data.user,
-        //   })
-        //   route.push("/")
-        // } else {
-        //   route.push("/verify-account")
-        // }
-        route.push("/")
+        if (data.data.user.isEmailVerified) {
+          saveAccountInfo({
+            ...data.data.user,
+          })
+          if (data.data.user.role === ROLE_ACCOUNT.USER) {
+            route.push("/")
+          } else {
+            route.push("/admin")
+          }
+        } else {
+          route.push("/verify-account")
+        }
         setTimeout(() => {
           notify(NOTIFICATION_TYPE.SUCCESS, "Login successfully!")
         }, 50)
@@ -93,6 +97,25 @@ const Login = () => {
       }
     }
   }
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.addEventListener("keypress", (e: any) => {
+        if (e.key === "Enter") {
+          e.preventDefault()
+          onLogin()
+        }
+      })
+    }
+    return () => {
+      inputRef.current?.removeEventListener("keypress", (e: any) => {
+        if (e.key === "Enter") {
+          e.preventDefault()
+          onLogin()
+        }
+      })
+    }
+  }, [])
 
   return (
     <div className="bg-theme hero min-h-screen">
@@ -128,6 +151,7 @@ const Login = () => {
               type="password"
               placeholder="Enter your password"
               value={loginInfo.password}
+              ref={inputRef}
               onChange={handleChangeLoginInfo}
             />
             <p className="text-sm text-red-400">{errorMessage.password && errorMessage.password}</p>

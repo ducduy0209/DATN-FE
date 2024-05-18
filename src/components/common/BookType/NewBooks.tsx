@@ -50,7 +50,7 @@ const NewBooks = () => {
     <div className="my-4 rounded-md bg-white p-4 shadow-lg">
       <div className="my-4 flex justify-between border-b-1 pb-2 text-slate-500">
         <p className="font-semibold">Sách mới nhất</p>
-        <Link href="" className="flex items-center gap-1 hover:text-blue-500">
+        <Link href={`/all-book/new`} className="flex items-center gap-1 hover:text-blue-500">
           <span>Xem toàn bộ</span>
           <Icon name="arrow-right-to-line" />
         </Link>
@@ -62,8 +62,12 @@ const NewBooks = () => {
             className="flex w-[220px] justify-center text-center"
             onClick={() => route.push(`/book/${book.slug}`)}
           >
-            <div className="flex w-[200px] flex-col gap-2">
-              <Image src={`localhost:3000/img/books/${book.cover_image}`} alt={book.title} className="min-h-[100px]" />
+            <div className="flex w-[200px] flex-col items-center gap-2">
+              <Image
+                src={`http://localhost:3000/img/books/${book.cover_image}`}
+                alt={book.title}
+                className="mx-auto h-[200px]"
+              />
               <p className="line-clamp-3 text-black">{book.title}</p>
               <RateStar rate={book.rating} />
               <p className="uppercase text-black">{book.author}</p>

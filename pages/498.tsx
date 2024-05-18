@@ -1,6 +1,6 @@
 import { useRouter } from "next/router"
-import CustomButton from "@components/common/CustomButton"
 import MainLayout from "@components/layouts/MainLayout"
+import { CustomButton } from "@components/common/CustomButton"
 
 const Page498 = () => {
   const router = useRouter()
@@ -11,10 +11,12 @@ const Page498 = () => {
 
   return (
     <MainLayout className="h-full" title="Access Denied">
-      <div className="text-primary -mt-20 flex h-[calc(100vh-120px)] flex-col items-center justify-center">
-        <p className="text-center text-[5rem] font-bold sm:text-[6rem]">Access Denied</p>
-        <p className="mb-4 text-3xl font-semibold">You don't have permission to access this page</p>
-        <CustomButton label="Back To Home" onClick={backToHome} />
+      <div className="-mt-20 flex h-[calc(100vh-120px)] flex-col items-center justify-center text-red-400">
+        <p className="sm:text-[6rem] text-center text-[5rem] font-bold">Truy cập bị từ chối</p>
+        <p className="mb-4 text-3xl font-semibold">Bạn không có quyền truy cập vào trang này</p>
+        <CustomButton onClick={backToHome} color="green">
+          Quay lại trang chủ
+        </CustomButton>
       </div>
     </MainLayout>
   )

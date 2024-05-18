@@ -16,6 +16,10 @@ const Navigation = () => {
     return <BoosterNav />
   }
 
+  if (accountInfo?.role === ROLE_ACCOUNT.ADMIN) {
+    return <BoosterNav />
+  }
+
   return <GuestNav />
 }
 

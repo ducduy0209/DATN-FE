@@ -27,6 +27,8 @@ import { useBoundStore } from "@zustand/total"
 import { NOTIFICATION_TYPE, notify } from "@utils/notify"
 import BookType from "@components/common/BookType"
 import PdfViewer from "@components/common/PdfViewer"
+import copy from "copy-to-clipboard"
+import { useRouter } from "next/router"
 
 type Props = {
   id: string
@@ -59,20 +61,22 @@ const MOCK_BOOK = {
 
 const BookScreen = ({ id }: Props) => {
   const sliderRef = useRef<any>(null)
-  const [selectImage, setSelectImage] = useState<string>(MOCK_BOOK.images[0])
+  const [selectImage, setSelectImage] = useState<string>()
   const [isPreview, setIsPreview] = useState<boolean>(false)
   const [comment, setComment] = useState<string>("")
   const [isCommentNull, setIsCommentNull] = useState<boolean>(false)
   const [rating, setRating] = useState<number>(5)
   const [book, setBook] = useState<Book>()
   const [duration, setDuration] = useState<string>("1 month")
-  const { authInfo } = useBoundStore((state) => ({
+  const { authInfo, accountInfo } = useBoundStore((state) => ({
     authInfo: state.authInfo,
+    accountInfo: state.accountInfo,
   }))
   const [pdfBuffer, setPdfBuffer] = useState<ArrayBuffer>()
   const { isOpen, onOpen, onOpenChange } = useDisclosure()
+  const route = useRouter()
 
-  const handleAddToCart = async () => {
+  const handleAddToCart = async (isBuyNow: boolean = false) => {
     const priceCalculated = book?.prices.find((price) => price.duration === duration)?.price
     const response = await fetch(API_ENDPOINT + "/carts", {
       method: "POST",
@@ -89,6 +93,9 @@ const BookScreen = ({ id }: Props) => {
     const raw = (await response.json()) as Response<null>
     if (raw.status === "success") {
       notify(NOTIFICATION_TYPE.SUCCESS, "Thêm vào giỏ hàng thành công")
+      if (isBuyNow) {
+        route.push("/cart")
+      }
     } else {
       notify(NOTIFICATION_TYPE.ERROR, "Có lỗi xảy ra, vui lòng thử lại!")
     }
@@ -133,6 +140,7 @@ const BookScreen = ({ id }: Props) => {
         const raw = (await response.json()) as Response<{ book: Book }>
         if (raw.data?.book) {
           setBook(raw.data.book)
+          setSelectImage(raw.data.book.cover_image)
         }
       }
       handleFetchBook()
@@ -165,25 +173,10 @@ const BookScreen = ({ id }: Props) => {
     sliderRef.current.slickPrev()
   }
 
-  // useEffect(() => {
-  //   if (book?.id) {
-  //     const fetchPdfUrl = async () => {
-  //       try {
-  //         const response = await fetch(API_ENDPOINT + `/books/preview/${book?.id}`, {
-  //           headers: {
-  //             "Content-Type": "application/pdf",
-  //             Authorization: `Bearer ${authInfo.access?.token}`,
-  //           },
-  //         })
-  //         const buffer = await response.arrayBuffer()
-  //         setPdfBuffer(buffer)
-  //       } catch (error) {
-  //         console.error("Error fetching PDF:", error)
-  //       }
-  //     }
-  //     fetchPdfUrl()
-  //   }
-  // }, [book])
+  const handleShare = () => {
+    copy(`localhost:3002/book/${id}?refer_code=${accountInfo?.my_refer_code}`)
+    notify(NOTIFICATION_TYPE.SUCCESS, "Copy referral link successfully!")
+  }
 
   return (
     <div className="px-40 py-4">
@@ -209,7 +202,7 @@ const BookScreen = ({ id }: Props) => {
           <Icon name="chevron-down" onClick={next} />
         </div>
         <div className="flex flex-col items-center gap-4">
-          <Image src={selectImage} width={200} className="rounded-none" />
+          <Image src={`http://localhost:3000/img/books/${selectImage}`} width={200} className="rounded-none" />
           <CustomButton color="default" onClick={onOpen}>
             Preview
           </CustomButton>
@@ -229,7 +222,10 @@ const BookScreen = ({ id }: Props) => {
               <p className="font-semibold">{book?.amount_borrowed}</p>
               <p>Đã thuê</p>
             </div>
-            <div className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300">
+            <div
+              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300"
+              onClick={handleShare}
+            >
               <Icon name="share" width={20} />
             </div>
           </div>
@@ -261,10 +257,10 @@ const BookScreen = ({ id }: Props) => {
             <div className="my-4 border-t-2 py-4">
               <p className="pb-2 font-semibold">Thành tiền</p>
               <div className="flex w-full gap-2">
-                <CustomButton color="green" className="basis-1/2">
+                <CustomButton color="green" className="basis-1/2" onClick={() => handleAddToCart(true)}>
                   Mua ngay
                 </CustomButton>
-                <CustomButton color="green" className="basis-1/2" isGhost onClick={handleAddToCart}>
+                <CustomButton color="green" className="basis-1/2" isGhost onClick={() => handleAddToCart()}>
                   Thêm vào giỏ
                 </CustomButton>
               </div>

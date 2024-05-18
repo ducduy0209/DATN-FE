@@ -8,6 +8,7 @@ import { API_ENDPOINT } from "@models/api"
 import { Response } from "@models/api"
 import { Link } from "lucide-react"
 import { useRouter } from "next/router"
+import { Book } from "@models/book"
 
 const CATEGORYS = [
   "Khoa học cơ bản",
@@ -21,11 +22,20 @@ const CATEGORYS = [
   "NXB Nông nghiệp",
 ]
 
+export type Banner = {
+  isActive: boolean
+  due_date: string | null
+  name: string
+  image: string
+  id: string
+}
+
 const DocumentCategory = () => {
   const route = useRouter()
   const [catagories, setCategories] = useState<Category[]>([])
   const [search, setSearch] = useState<string>("")
   const searchRef = useRef<HTMLInputElement>(null)
+  const [banners, setBanners] = useState<Banner[]>()
 
   const handleChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value)
@@ -67,6 +77,19 @@ const DocumentCategory = () => {
     handleFetchCategorys()
   }, [])
 
+  useEffect(() => {
+    const handleFetchBanners = async () => {
+      const response = await fetch(API_ENDPOINT + "/banners?name=Banner&isActive=true", {
+        headers: { "Content-Type": "application/json" },
+      })
+      const raw = (await response.json()) as Response<any>
+      if (!!raw?.data?.results?.length) {
+        setBanners(raw.data.results)
+      }
+    }
+    handleFetchBanners()
+  }, [])
+
   return (
     <>
       <div className="flex h-[60px] items-center justify-between bg-green-500 px-40">
@@ -90,7 +113,7 @@ const DocumentCategory = () => {
       <div className="flex bg-green-400 px-40">
         <div className="relative h-[428px] w-72 bg-white">
           <div className="flex h-[428px] w-72 flex-col bg-white">
-            {catagories.map((category) => (
+            {catagories.slice(0, 8).map((category) => (
               <div
                 onClick={() => route.push(`/category/${category.slug}`)}
                 key={category.id}
@@ -106,7 +129,7 @@ const DocumentCategory = () => {
             </div>
           </div>
         </div>
-        <BookGrid />
+        <BookGrid banners={banners} />
       </div>
     </>
   )

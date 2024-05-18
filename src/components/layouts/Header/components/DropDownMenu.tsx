@@ -35,22 +35,23 @@ const DropDownMenu = () => {
         <p className="my-2 font-medium">{accountInfo?.name}</p>
       </div>
       <div className="flex flex-col gap-4 border-t border-gray-300 p-4">
-        {accountInfo?.role === ROLE_ACCOUNT.USER && (
-          <div>
-            <div className="hover cursor-pointer rounded-md border-b-1 px-4 py-2 hover:bg-white hover:text-black">
-              <Link href={"/profile/purchased-books"}>Sách đã mua</Link>
-            </div>
-            <div className="hover mb-2 cursor-pointer rounded-md border-b-1 px-4 py-2 hover:bg-white hover:text-black">
-              <Link href={"/profile/my-account"}>Thông tin tài khoản</Link>
-            </div>
-            <div className="hover mb-2 cursor-pointer rounded-md border-b-1 px-4 py-2 hover:bg-white hover:text-black">
-              <Link href={"/profile/change-password"}>Đổi mật khẩu</Link>
-            </div>
-            <div className="hover mb-2 cursor-pointer rounded-md border-b-1 px-4 py-2 hover:bg-white hover:text-black">
-              <Link href={"/profile/purchase-history"}>Lịch sự mua hàng</Link>
-            </div>
+        <div>
+          <div className="hover cursor-pointer rounded-md border-b-1 px-4 py-2 hover:bg-white hover:text-black">
+            <Link href={"/profile/purchased-books"}>Sách đã mua</Link>
           </div>
-        )}
+          <div className="hover mb-2 cursor-pointer rounded-md border-b-1 px-4 py-2 hover:bg-white hover:text-black">
+            <Link href={"/profile/my-account"}>Thông tin tài khoản</Link>
+          </div>
+          <div className="hover mb-2 cursor-pointer rounded-md border-b-1 px-4 py-2 hover:bg-white hover:text-black">
+            <Link href={"/profile/change-password"}>Đổi mật khẩu</Link>
+          </div>
+          <div className="hover mb-2 cursor-pointer rounded-md border-b-1 px-4 py-2 hover:bg-white hover:text-black">
+            <Link href={"/profile/purchase-history"}>Lịch sự mua hàng</Link>
+          </div>
+          <div className="hover mb-2 cursor-pointer rounded-md border-b-1 px-4 py-2 hover:bg-white hover:text-black">
+            <Link href={"/profile/referral"}>Tiếp thị liên kết</Link>
+          </div>
+        </div>
 
         <br />
         <CustomButton onClick={onLogout} color="green">

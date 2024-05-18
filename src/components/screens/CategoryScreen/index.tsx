@@ -122,7 +122,11 @@ const CategoryScreen = ({ category }: Props) => {
           <p className="pb-4 text-lg">Chủ đề tiêu biểu</p>
           {catagories.length &&
             catagories.map((categoryItem) => (
-              <div key={categoryItem.id} className="flex items-center gap-1 border-b-2 py-2 text-sm">
+              <div
+                key={categoryItem.id}
+                onClick={() => route.push(`/category/${categoryItem.slug}`)}
+                className="flex cursor-pointer items-center gap-1 border-b-2 py-2 text-sm"
+              >
                 <Icon name="folder-open" />
                 <p>{categoryItem.name}</p>
               </div>

@@ -48,8 +48,7 @@ const VerifyAccountPage = () => {
           },
           body: JSON.stringify({ token }),
         })
-        const raw = (await response.json()) as Response<null>
-        if (response.status === 200) {
+        if (response.status === 204) {
           saveAccountInfo({
             ...accountInfo,
             isActive: true,
