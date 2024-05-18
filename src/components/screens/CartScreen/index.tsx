@@ -53,7 +53,7 @@ const CartScreen = () => {
       return {
         bookId: book.book_id.id,
         duration: book.duration,
-        price: totalPrice - discount,
+        price: book.book_id.prices.find((item) => item.duration === book.duration)?.price,
         referCode: book.refer_code,
         couponCode: coupon,
       }

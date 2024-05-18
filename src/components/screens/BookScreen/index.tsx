@@ -9,6 +9,7 @@ import {
   DropdownMenu,
   DropdownTrigger,
   Image,
+  Pagination,
   Textarea,
   useDisclosure,
 } from "@nextui-org/react"
@@ -19,7 +20,7 @@ import { formatCurrency } from "@utils/formatCurrency"
 import { CustomButton } from "@components/common/CustomButton"
 import { MOCK_BOOKS } from "@constants/book"
 import { Book } from "@models/book"
-import { API_ENDPOINT } from "@models/api"
+import { API_ENDPOINT, DataWithPagination } from "@models/api"
 import { Response } from "@models/api"
 import moment from "moment"
 import { detectLanguage } from "@utils/detectLanguage"
@@ -30,34 +31,22 @@ import PdfViewer from "@components/common/PdfViewer"
 import copy from "copy-to-clipboard"
 import { useRouter } from "next/router"
 import { useSearchParams } from "next/navigation"
+import ReviewItem from "./components/ReviewItem"
 
 type Props = {
   id: string
 }
-const settings = {
-  dots: false,
-  infinite: true,
-  slidesToShow: 1,
-  slidesToScroll: 1,
-  vertical: true,
-  verticalSwiping: true,
-  swipeToSlide: true,
-}
 
-const MOCK_BOOK = {
-  images: [
-    "https://images.nxbxaydung.com.vn/Picture/2020/biasach-0604092220.png",
-    "https://images.nxbxaydung.com.vn/Picture/2020/bt-he-thong-bang-tra-t3-0519095005.png",
-    "https://images.nxbxaydung.com.vn/Picture/2020/biasach-0610095013.jpg",
-    "https://images.nxbxaydung.com.vn/Picture/2020/biasach-0604092220.png",
-    "https://images.nxbxaydung.com.vn/Picture/2020/bt-he-thong-bang-tra-t3-0519095005.png",
-    "https://images.nxbxaydung.com.vn/Picture/2020/biasach-0610095013.jpg",
-  ],
-  title: "Tập sách về Bài tập và hệ thống bảng tra thủy văn công trình giao thông",
-  star: 5,
-  view: 1836,
-  sold_amount: 39,
-  price: "90000",
+export type Review = {
+  rating: number
+  comment: string
+  isAdjusted: string
+  book_id: string
+  user_id: {
+    image: string
+    name: string
+    id: string
+  }
 }
 
 const BookScreen = ({ id }: Props) => {
@@ -77,6 +66,32 @@ const BookScreen = ({ id }: Props) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure()
   const route = useRouter()
   const searchParams = useSearchParams()
+  const [reviews, setReviews] = useState<DataWithPagination<Review[]>>()
+  const [page, setPage] = useState<number>(1)
+  const [isUpdateReviews, setIsUpdateReviews] = useState<boolean>(false)
+
+  const handleSelectReview = (reviewSelected: Review) => {
+    setComment(reviewSelected.comment)
+    setRating(reviewSelected.rating)
+  }
+
+  useEffect(() => {
+    const handleFetchReviews = async () => {
+      const response = await fetch(API_ENDPOINT + `/books/${book?.id}/reviews?limit=8&page=${page}`, {
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${authInfo?.access?.token}`,
+        },
+      })
+      const raw = (await response.json()) as Response<DataWithPagination<Review[]>>
+      if (raw.data?.results) {
+        setReviews(raw.data)
+      }
+    }
+    if (book?.id) {
+      handleFetchReviews()
+    }
+  }, [page, book?.id, isUpdateReviews])
 
   const handleAddToCart = async (isBuyNow: boolean = false) => {
     const refer_code = searchParams.get("refer_code")
@@ -124,6 +139,7 @@ const BookScreen = ({ id }: Props) => {
         notify(NOTIFICATION_TYPE.ERROR, raw.message ? raw.message : "Có lỗi xảy ra, vui lòng thử lại!")
       } else {
         notify(NOTIFICATION_TYPE.SUCCESS, "Bình luận thành công")
+        setIsPreview(!isPreview)
       }
     } else {
       setIsCommentNull(true)
@@ -282,10 +298,10 @@ const BookScreen = ({ id }: Props) => {
         </div>
         <div className="flex gap-4 pt-6">
           <div className="basis-1/2 border-r-2">
-            <p className="text-xl">Thông tin xuất bản</p>
+            <p className="text-lg">Thông tin xuất bản:</p>
             <div className="ml-2">
               <div>
-                <span className="font-semibold">- Năm XB: </span>
+                <span className="font-semibold">- Năm xuất bản: </span>
                 <span>{moment(book?.published_date).format("L")}</span>
               </div>
               <div>
@@ -307,14 +323,36 @@ const BookScreen = ({ id }: Props) => {
             </div>
           </div>
           <div className="basis-1/2">
-            <p className="text-xl">Giới thiệu</p>
+            <p className="text-lg">Tóm tắt sách:</p>
             <p>{book?.summary}</p>
           </div>
         </div>
       </div>
       <div className="mt-8 rounded-lg bg-white p-8">
+        {reviews?.totalPages && reviews?.totalPages > 1 ? (
+          <Pagination
+            color="success"
+            className="mt-4"
+            showControls
+            total={reviews.totalPages}
+            initialPage={page}
+            onChange={(pageChanged: number) => setPage(pageChanged)}
+          />
+        ) : (
+          ""
+        )}
+        <div className="mb-4 flex flex-wrap">
+          {reviews?.results.length
+            ? reviews.results.map((review) => <ReviewItem review={review} handleSelectReview={handleSelectReview} />)
+            : "Chưa có lượt đánh giá nào."}
+        </div>
         <p className="mb-4 text-xl font-semibold">Bình luận</p>
-        <Textarea placeholder="Để lại bình luận của bạn" className="mb-4 max-w-xs" onChange={handleChangeComment} />
+        <Textarea
+          placeholder="Để lại bình luận của bạn"
+          className="mb-4 max-w-xs"
+          onChange={handleChangeComment}
+          value={comment}
+        />
         {isCommentNull && (
           <p className="-mt-2 mb-2 text-xs text-red-400">Vui lòng ghi nhận xét trước khi gửi bình luận.</p>
         )}
