@@ -60,8 +60,8 @@ const ReadBook = ({ bookId }: Props) => {
     <>
       {pdfUrl ? (
         <div className="relative h-full w-full">
-          <div className="z-99 absolute h-[40px] w-[500px] bg-[#F7F7F7]"></div>
-          <div className="z-99 absolute right-0 h-[40px] w-[500px] bg-[#F7F7F7]"></div>
+          <div className="z-99 absolute h-[40px] w-[500px] bg-[#323639]"></div>
+          <div className="z-99 absolute right-0 h-[40px] w-[500px] bg-[#323639]"></div>
           <iframe src={`${pdfUrl}`} className="h-full w-full" />
         </div>
       ) : (
