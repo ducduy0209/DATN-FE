@@ -105,24 +105,24 @@ const ChangePassword = () => {
         <CustomInput
           type="password"
           name="oldPass"
-          label="Old password"
-          placeholder="Old password"
+          label="Mật khẩu hiện tại"
+          placeholder="Mật khẩu hiện tại"
           onChange={handleChangeInput}
         />
         {errorMessage.oldPass && <span className="text-red-600">{errorMessage.oldPass}</span>}
         <CustomInput
           type="password"
           name="newPass"
-          label="New password"
-          placeholder="New password"
+          label="Mật khẩu mới"
+          placeholder="Mật khẩu mới"
           onChange={handleChangeInput}
         />
         {errorMessage.newPass && <span className="text-red-600">{errorMessage.newPass}</span>}
         <CustomInput
           type="password"
           name="reEnterPass"
-          label="Re-enter new password"
-          placeholder="Re-enter new password"
+          label="Xác nhận mật khẩu"
+          placeholder="Xác nhận mật khẩu"
           onChange={handleChangeInput}
         />
         {errorMessage.reEnterPass && <span className="text-red-600">{errorMessage.reEnterPass}</span>}

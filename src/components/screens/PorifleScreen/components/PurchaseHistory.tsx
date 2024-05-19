@@ -79,8 +79,8 @@ const PurchaseHistory = () => {
                   <Link href={`/book/${item.book_id?.slug}`}>{item.book_id?.title}</Link>
                 </TableCell>
                 <TableCell>{moment(item.borrow_date).format("L")}</TableCell>
-                <TableCell>{moment(item.due_date).format("L")}</TableCell>
-                <TableCell>{item.duration}</TableCell>
+                <TableCell>{item.due_date ? moment(item.due_date).format("L") : "Vĩnh viễn"}</TableCell>
+                <TableCell>{item.duration === 'forever' ? "Vĩnh viễn" : item.duration.replaceAll(/\bmonths?\b/gi, "tháng")}</TableCell>
                 <TableCell>
                   {item.isExpired ? (
                     <Chip color="danger">Đã hết hạn</Chip>
