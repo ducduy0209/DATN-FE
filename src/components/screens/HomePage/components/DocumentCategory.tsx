@@ -128,9 +128,9 @@ const DocumentCategory = () => {
                 {category.name}
               </div>
             ))}
-            <div className="flex h-full cursor-pointer items-center justify-center gap-1 text-green-400 hover:text-green-500">
+            <div className="flex h-full cursor-pointer items-center justify-center gap-1 text-green-400 hover:text-green-500" onClick={() => route.push('/all-book/new')}>
               <Icon name="align-justify" />
-              Xem tất cả danh mục
+                Xem tất cả danh mục
             </div>
           </div>
         </div>

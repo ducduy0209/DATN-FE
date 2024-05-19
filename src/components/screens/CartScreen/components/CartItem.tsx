@@ -17,39 +17,43 @@ const CartItem = ({ book, handleUpdateCart, handleDeleteCart }: Props) => {
         src={`http://localhost:3000/img/books/${book.book_id.cover_image}`}
         alt={book.book_id.title}
         className="border-2"
+        width="160"
+        height="260"
       />
-      <div>
-        <p>{book.book_id.title}</p>
-        <div className="flex items-center gap-4">
-          <p>Thời gian</p>
-          <Dropdown>
-            <DropdownTrigger>
-              <Button variant="bordered">
-                {book.duration === "forever" ? "Vĩnh viễn" : book.duration.split(" ")[0] + " tháng"}
-              </Button>
-            </DropdownTrigger>
-            <DropdownMenu aria-label="Static Actions">
-              {book.book_id.prices.length ? (
-                book.book_id.prices.map((price) => (
-                  <DropdownItem key={price.duration} onPress={() => handleUpdateCart(book.id, price.duration)}>
-                    {price.duration === "forever" ? "Vĩnh viễn" : `${price.duration.split(" ")[0]} tháng`}
-                  </DropdownItem>
-                ))
-              ) : (
-                <DropdownItem></DropdownItem>
-              )}
-            </DropdownMenu>
-          </Dropdown>
+      <div className="flex justify-between w-full">
+        <div>
+          <p>{book.book_id.title}</p>
+          <div className="flex items-center gap-4">
+            <p>Thời gian</p>
+            <Dropdown>
+              <DropdownTrigger>
+                <Button variant="bordered">
+                  {book.duration === "forever" ? "Vĩnh viễn" : book.duration.split(" ")[0] + " tháng"}
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu aria-label="Static Actions">
+                {book.book_id.prices.length ? (
+                  book.book_id.prices.map((price) => (
+                    <DropdownItem key={price.duration} onPress={() => handleUpdateCart(book.id, price.duration)}>
+                      {price.duration === "forever" ? "Vĩnh viễn" : `${price.duration.split(" ")[0]} tháng`}
+                    </DropdownItem>
+                  ))
+                ) : (
+                  <DropdownItem></DropdownItem>
+                )}
+              </DropdownMenu>
+            </Dropdown>
+          </div>
+          <div className="flex gap-4">
+            <p>Thành tiền: </p>
+            <p className="text-xl font-semibold text-red-400">
+              {formatCurrency(book.book_id.prices.find((item) => item.duration === book.duration)?.price.toString())}
+            </p>
+          </div>
         </div>
-        <div className="flex gap-4">
-          <p>Thành tiền: </p>
-          <p className="text-xl font-semibold text-red-400">
-            {formatCurrency(book.book_id.prices.find((item) => item.duration === book.duration)?.price.toString())}
-          </p>
+        <div>
+          <Icon name="trash" className="cursor-pointer" onClick={() => handleDeleteCart(book.id)} />
         </div>
-      </div>
-      <div>
-        <Icon name="trash" className="cursor-pointer" onClick={() => handleDeleteCart(book.id)} />
       </div>
     </div>
   )
