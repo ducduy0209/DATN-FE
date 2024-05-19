@@ -28,4 +28,11 @@ export type Book = {
   languange: BOOK_LANGUAGES
   rating: number
   price: number
+  access_status: ACCESS_STATUS
+}
+
+export enum ACCESS_STATUS {
+  VIEW = "view",
+  DOWNLOAD = "download",
+  DENIED = "denied",
 }

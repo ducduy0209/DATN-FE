@@ -1,5 +1,6 @@
 import {
   Chip,
+  Input,
   Pagination,
   Spinner,
   Table,
@@ -19,6 +20,8 @@ import moment from "moment"
 import { useRouter } from "next/router"
 import { CustomButton } from "@components/common/CustomButton"
 import Link from "next/link"
+import { NOTIFICATION_TYPE, notify } from "@utils/notify"
+import { ROLE_ACCOUNT } from "@models/user"
 
 const columns = [
   {
@@ -60,12 +63,14 @@ type Referral = {
 
 const Referral = () => {
   const route = useRouter()
-  const { authInfo } = useBoundStore((state) => ({
+  const { authInfo, accountInfo } = useBoundStore((state) => ({
     authInfo: state.authInfo,
+    accountInfo: state.accountInfo,
   }))
 
   const [referrals, setReferrals] = useState<DataWithPagination<Referral[]>>()
   const [page, setPage] = useState<number>(1)
+  const [email, setEmail] = useState<string>("")
 
   useEffect(() => {
     const handleFetchReferrals = async () => {
@@ -76,16 +81,45 @@ const Referral = () => {
       console.log(data)
       if (data?.data?.results) {
         setReferrals(data.data)
+        setEmail(data.data.results[0].email_receiver)
       }
     }
     handleFetchReferrals()
   }, [page])
 
-  console.log(referrals)
+  const handleUpdateEmail = async () => {
+    const response = await fetch(API_ENDPOINT + `/affiliates/${referrals?.results[0].id}`, {
+      method: "PATCH",
+      headers: {
+        authorization: `Bearer ${authInfo?.access?.token}`,
+      },
+      body: JSON.stringify({
+        email_receiver: email,
+      }),
+    })
+    if (response.status === 200) {
+      notify(NOTIFICATION_TYPE.SUCCESS, "Cập nhật email thành công!")
+    } else {
+      notify(NOTIFICATION_TYPE.ERROR, "Có lỗi xảy ra, vui lòng thử lại!")
+    }
+  }
 
   return (
     <div className="px-12 py-10">
       <p className="mb-8 text-xl font-semibold">Tiếp thị liên kết của bạn</p>
+      {accountInfo?.role === ROLE_ACCOUNT.USER && (
+        <div className="flex items-center gap-2">
+          <Input
+            className="mb-4"
+            label="Nhập email để nhận hoa hồng"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <CustomButton color="green" onClick={handleUpdateEmail} isDisabled={!email}>
+            Xác nhận
+          </CustomButton>
+        </div>
+      )}
       <Table aria-label="Example table with dynamic content">
         <TableHeader columns={columns}>
           {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}

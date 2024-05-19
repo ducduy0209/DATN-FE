@@ -27,7 +27,12 @@ const PdfViewer = ({ bookId, title, isOpen, onOpen, onOpenChange }: Props) => {
               <ModalHeader className="flex flex-col gap-1">Preview book: {title}</ModalHeader>
               <ModalBody>
                 <div className="absolute left-[50%] top-[50%] -z-10">{isLoading && <Spinner />}</div>
-                <iframe src={pdfLink} title="preview book" className="h-full w-full" ref={pdfRef} />
+                <iframe
+                  src={`${pdfLink}#toolbar=0&navpanes=0&scrollbar=0`}
+                  title="preview book"
+                  className="h-full w-full"
+                  ref={pdfRef}
+                />
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={onClose}>

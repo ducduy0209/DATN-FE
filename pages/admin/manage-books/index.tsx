@@ -40,6 +40,11 @@ type Column = {
   uid: string
 }
 
+type Price = {
+  duration: string
+  price: number
+}
+
 type BookSelected = {
   title: string
   author: string
@@ -49,12 +54,7 @@ type BookSelected = {
   cover_image: string
   total_book_pages: number
   digital_content: number
-  prices: [
-    {
-      duration: string
-      price: number
-    },
-  ]
+  prices: Price[]
   languange: BOOK_LANGUAGES
   price: number
 }
@@ -88,7 +88,7 @@ const ManageBooks = () => {
     cover_image: "",
     total_book_pages: 0,
     digital_content: 0,
-    prices: [{ duration: "", price: 0 }],
+    prices: [{ duration: "1 month", price: 0 }],
     languange: BOOK_LANGUAGES.VI,
     price: 0,
   })
@@ -214,10 +214,10 @@ const ManageBooks = () => {
     })
   }
 
-  const handleChangeDate = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChangeDate = (e: DateValue) => {
     setBookSelected({
       ...bookSelected,
-      published_date: e.target.value,
+      published_date: e.toString(),
     })
   }
 
@@ -258,6 +258,18 @@ const ManageBooks = () => {
                   <>
                     {item[0] === "published_date" ? (
                       <DatePicker label="Published Date" onChange={handleChangeDate} />
+                    ) : item[0] === "prices" ? (
+                      <div>
+                        <p className="text-sm">Prices</p>
+                        {Object.values(item[1]).map((i) => (
+                          <Input
+                            label={i.duration}
+                            value={i.price}
+                            name={`prices_${i.duration}_${i.price}`}
+                            onChange={handleChangeBookSelected}
+                          />
+                        ))}
+                      </div>
                     ) : (
                       <Input
                         label={(item[0].slice(0, 1).toUpperCase() + item[0].slice(1)).replace("_", " ")}

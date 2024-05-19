@@ -198,6 +198,13 @@ const BookScreen = ({ id }: Props) => {
     notify(NOTIFICATION_TYPE.SUCCESS, "Copy referral link successfully!")
   }
 
+  useEffect(() => {
+    const handleIncreaseView = async () => {
+      await fetch(API_ENDPOINT + `/books/increase-view/${book?.id}`)
+    }
+    handleIncreaseView()
+  }, [])
+
   return (
     <div className="px-40 py-4">
       {book?.id && (

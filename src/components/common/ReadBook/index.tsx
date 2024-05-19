@@ -1,66 +1,79 @@
-import React, { useState, useEffect } from "react"
-import { Document, Page } from "react-pdf"
+import React, { useEffect, useState } from "react"
+import { Document, Page, pdfjs } from "react-pdf"
 import axios from "axios"
-import { API_ENDPOINT } from "@models/api"
+import { useRouter } from "next/router"
 import { useBoundStore } from "@zustand/total"
+import "@react-pdf-viewer/core/lib/styles/index.css"
+import "@react-pdf-viewer/default-layout/lib/styles/index.css"
+import { Spinner } from "@nextui-org/react"
+import { CustomButton } from "../CustomButton"
+
+// Cấu hình workerSrc cho pdfjs
+pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`
 
 type Props = {
   bookId: string
 }
 
 const ReadBook = ({ bookId }: Props) => {
-  const [numPages, setNumPages] = useState<number>()
+  const [numPages, setNumPages] = useState<number | null>(null)
   const [pageNumber, setPageNumber] = useState<number>(1)
-  const [pdfUrl, setPdfUrl] = useState<string>()
-
+  const [pdfUrl, setPdfUrl] = useState<string>("")
   const { authInfo } = useBoundStore((state) => ({
     authInfo: state.authInfo,
   }))
 
   useEffect(() => {
-    // Hàm này sẽ gửi yêu cầu API và nhận phản hồi PDF khi component được render
     const fetchPdf = async () => {
       try {
-        // Thực hiện yêu cầu API với thông tin xác thực nếu cần
-        const response = await axios.get(`${API_ENDPOINT}/books/read/${bookId}`, {
-          responseType: "blob", // Đặt kiểu dữ liệu phản hồi là blob để xử lý PDF
+        const response = await axios.get(`http://localhost:3000/v1/books/read/${bookId}`, {
+          responseType: "blob",
           headers: {
-            Authorization: `Bearer ${authInfo.access?.token}`, // Thay thế bằng token xác thực thực của bạn
+            Authorization: `Bearer ${authInfo.access?.token}`, // Thay thế bằng token xác thực của bạn
           },
         })
 
-        // Tạo URL cho blob PDF và cập nhật state
+        if (response.status !== 200) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+
         const pdfBlob = new Blob([response.data], { type: "application/pdf" })
         const pdfUrl = URL.createObjectURL(pdfBlob)
         setPdfUrl(pdfUrl)
+        console.log(pdfUrl)
       } catch (error) {
-        console.error("Lỗi khi gửi yêu cầu API:", error)
+        console.error("Error fetching PDF:", error)
       }
     }
 
-    fetchPdf() // Gọi hàm fetchPdf khi component được render
-  }, [])
+    if (bookId) {
+      fetchPdf()
+    }
+  }, [bookId, authInfo])
 
-  function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
+  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages)
+    setPageNumber(1)
   }
 
   return (
-    <div>
+    <>
       {pdfUrl ? (
-        <div>
-          <Document file={pdfUrl} onLoadSuccess={onDocumentLoadSuccess}>
-            <Page pageNumber={pageNumber} />
-          </Document>
-          <p>
-            Trang {pageNumber} của {numPages}
-          </p>
+        <div className="relative h-full w-full">
+          <div className="z-99 absolute h-[40px] w-[500px] bg-[#F7F7F7]"></div>
+          <div className="z-99 absolute right-0 h-[40px] w-[500px] bg-[#F7F7F7]"></div>
+          <iframe src={`${pdfUrl}`} className="h-full w-full" />
         </div>
       ) : (
-        <p>Đang tải PDF...</p>
+        <Spinner />
       )}
-    </div>
+    </>
   )
+}
+
+ReadBook.getInitialProps = async (ctx: any) => {
+  const { bookId } = ctx.query
+  return { bookId }
 }
 
 export default ReadBook

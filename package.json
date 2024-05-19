@@ -20,6 +20,8 @@
     "@nextui-org/date-picker": "^2.0.7",
     "@nextui-org/react": "^2.3.6",
     "@nextui-org/theme": "^2.2.3",
+    "@react-pdf-viewer/core": "^3.12.0",
+    "@react-pdf-viewer/default-layout": "^3.12.0",
     "@t3-oss/env-nextjs": "^0.7.1",
     "@tabler/icons-react": "^3.3.0",
     "@tanstack/react-query": "^5.4.3",

@@ -67,3 +67,7 @@
 .my_slider {
   z-index: 1;
 }
+
+#frame {
+  -ms-zoom: 2;
+}

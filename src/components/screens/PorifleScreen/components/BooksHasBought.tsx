@@ -5,6 +5,11 @@ import {
   DropdownMenu,
   DropdownTrigger,
   Image,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
   Pagination,
   Table,
   TableBody,
@@ -12,9 +17,10 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
+  useDisclosure,
 } from "@nextui-org/react"
 import React, { useEffect, useState } from "react"
-import { Book } from "@models/book"
+import { ACCESS_STATUS, Book } from "@models/book"
 import { API_ENDPOINT, DataWithPagination, Response } from "@models/api"
 import RateStar from "@components/common/RateStar"
 import { useBoundStore } from "@zustand/total"
@@ -22,6 +28,7 @@ import Link from "next/link"
 import moment from "moment"
 import { CustomButton } from "@components/common/CustomButton"
 import ReadBook from "@components/common/ReadBook"
+import { NOTIFICATION_TYPE, notify } from "@utils/notify"
 
 type BookResponse = {
   books: DataWithPagination<Book[]>
@@ -53,7 +60,8 @@ const BooksHasBought = () => {
   const { authInfo } = useBoundStore((state) => ({
     authInfo: state.authInfo,
   }))
-  const [bookRead, setBookRead] = useState<string>("")
+  const [bookRead, setBookRead] = useState<Book>()
+  const { isOpen, onOpen, onOpenChange } = useDisclosure()
 
   useEffect(() => {
     const handleFetchBooks = async () => {
@@ -72,9 +80,58 @@ const BooksHasBought = () => {
     handleFetchBooks()
   }, [])
 
+  const handleReadBook = (bookSelected: Book) => {
+    setBookRead(bookSelected)
+    onOpen()
+  }
+
+  const handleDownload = async (book: Book) => {
+    const response = await fetch(API_ENDPOINT + `/books/download/${book.id}`, {
+      headers: {
+        authorization: `Bearer ${authInfo?.access?.token}`,
+      },
+    })
+    if (response.status === 200) {
+      notify(NOTIFICATION_TYPE.SUCCESS, "Đang tải sách về!")
+      const contentDisposition = response.headers.get("Content-Disposition")
+      let filename = book.slug
+      const blob = await response.blob()
+
+      // Create a URL for the blob
+      const url = window.URL.createObjectURL(blob)
+
+      // Create a temporary link element
+      const a = document.createElement("a")
+      a.href = url
+      a.download = filename
+      document.body.appendChild(a)
+      a.click()
+
+      // Clean up
+      a.remove()
+      window.URL.revokeObjectURL(url)
+    } else {
+      notify(NOTIFICATION_TYPE.ERROR, "Có lỗi xảy ra khi tải sách, vui lòng thử lại")
+    }
+  }
+
   return (
     <div>
-      {bookRead && <ReadBook bookId={bookRead} />}
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="full" placement="center">
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">Read book: {bookRead?.title}</ModalHeader>
+              <ModalBody>{bookRead && <ReadBook bookId={bookRead.id} />}</ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Close
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
       <div className="flex items-center justify-between border-b-1 px-10 py-6">
         <p className="font-semibold">Sách bạn đã mua</p>
         <Dropdown>
@@ -105,8 +162,11 @@ const BooksHasBought = () => {
                   <TableCell>
                     <RateStar rate={item.rating} />
                   </TableCell>
-                  <TableCell>
-                    <CustomButton onClick={() => setBookRead(item.id)}>Đọc sách</CustomButton>
+                  <TableCell className="flex gap-1">
+                    <CustomButton onClick={() => handleReadBook(item)}>Đọc sách</CustomButton>
+                    {item.access_status === ACCESS_STATUS.DOWNLOAD && (
+                      <CustomButton onClick={() => handleDownload(item)}>Tải sách</CustomButton>
+                    )}
                   </TableCell>
                 </TableRow>
               )}
