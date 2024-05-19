@@ -91,10 +91,10 @@ const Login = () => {
           route.push("/verify-account")
         }
         setTimeout(() => {
-          notify(NOTIFICATION_TYPE.SUCCESS, "Login successfully!")
+          notify(NOTIFICATION_TYPE.SUCCESS, "Đăng nhập thành công")
         }, 50)
       } else {
-        notify(NOTIFICATION_TYPE.ERROR, !!data.message ? data.message : "Something wrong with server, try again!", {
+        notify(NOTIFICATION_TYPE.ERROR, !!data.message ? data.message : "Có lỗi xảy ra tại server, vui lòng thử lại", {
           toastId: uuidv4(),
         })
       }
