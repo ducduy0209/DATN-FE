@@ -116,8 +116,8 @@ const Login = () => {
             <Image width={50} height={50} alt="logo" src="/images/logo.png" />
           </div>
           <div className="text-center text-green-400 lg:text-left">
-            <h1 className="text-5xl font-bold">Welcome to Merchize Book Store! 👋🏻</h1>
-            <p className="py-6 text-slate-500">Please sign-in to your account and start the adventure.</p>
+            <h1 className="text-5xl font-bold">Chào mừng đến với Merchize Book Store! 👋🏻</h1>
+            <p className="py-6 text-slate-500">Hãy đăng ký tài khoản ngay để trải nghiệm vô vàn thứ thú vị</p>
           </div>
           <div className="flex w-full flex-col gap-4">
             <p className="text-default-400">Email</p>
@@ -129,7 +129,7 @@ const Login = () => {
               onChange={handleChangeLoginInfo}
             />
             <p className="text-sm text-red-400">{errorMessage.email && errorMessage.email}</p>
-            <p className="text-default-400">Password</p>
+            <p className="text-default-400">Mật khẩu</p>
             <Input
               name="password"
               type="password"
@@ -141,19 +141,19 @@ const Login = () => {
             <p className="text-sm text-red-400">{errorMessage.password && errorMessage.password}</p>
             <div className="flex items-center justify-between">
               <Checkbox isSelected={isRemember} color="success" onClick={() => setIsRemember(!isRemember)}>
-                Remember me
+                Lưu thông tin
               </Checkbox>
               <Link href="forgot-password" className="text-primary-400 hover:underline">
-                Forgot Password?
+                Quên mật khẩu
               </Link>
             </div>
             <CustomButton onClick={onLogin} color="green" isDisabled={!!errorMessage.email || !!errorMessage.password}>
-              Login
+              Đăng nhập
             </CustomButton>
             <div className="flex justify-center gap-1">
-              <p>You don't have account?</p>
+              <p>Bạn chưa có tài khoản</p>
               <Link href="/register" className="text-blue-400 hover:text-blue-500">
-                Register now.
+                Đăng ký ngay!
               </Link>
             </div>
           </div>

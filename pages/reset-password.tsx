@@ -86,7 +86,7 @@ const ResetPassword = () => {
             </CustomButton>
             <div className="flex justify-center gap-2">
               <Link href="login" className="text-primary-400 hover:underline">
-                Back to login
+                Quay lại trang đăng nhập
               </Link>
             </div>
           </div>

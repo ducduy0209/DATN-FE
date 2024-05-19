@@ -57,24 +57,24 @@ const ForgotPassword = () => {
         </div>
         <div className="w-full max-w-sm shrink-0 px-8 lg:w-1/2 lg:px-2">
           <div className="text-center text-slate-400 lg:text-left">
-            <h1 className="text-4xl font-bold">Forgot Password 🔒</h1>
+            <h1 className="text-4xl font-bold">Quên mật khẩu 🔒</h1>
           </div>
           <div className="mt-8 flex flex-col gap-4">
             <Input
               type="email"
               name="email"
               label="Vui lòng nhập email của bạn để lấy lại mật khẩu."
-              placeholder="Enter your email..."
+              placeholder="Nhập địa chỉ email..."
               labelPlacement="outside"
               onChange={handleChangeInput}
             />
             {errorMessage && <span className="text-red-600">{errorMessage}</span>}
             <CustomButton color="green" onClick={handleSubmit}>
-              Send{" "}
+              Gửi{" "}
             </CustomButton>
             <div className="flex justify-center gap-2">
               <Link href="login" className="text-primary-400 hover:underline">
-                Back to login
+                Quay lại trang đăng nhập
               </Link>
             </div>
           </div>
