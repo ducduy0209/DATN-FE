@@ -29,6 +29,7 @@ export type Book = {
   rating: number
   price: number
   access_status: ACCESS_STATUS
+  rating_count: number
 }
 
 export enum ACCESS_STATUS {

@@ -203,7 +203,7 @@ const BookScreen = ({ id }: Props) => {
       await fetch(API_ENDPOINT + `/books/increase-view/${book?.id}`)
     }
     handleIncreaseView()
-  }, [])
+  }, [book])
 
   return (
     <div className="px-40 py-4">
@@ -233,12 +233,16 @@ const BookScreen = ({ id }: Props) => {
               <RateStar rate={book?.rating ?? 0} />
             </div>
             <div className="flex items-center gap-1 border-r-2 px-2">
+              <p className="font-semibold">{book?.rating_count}</p>
+              <p>Lượt đánh giá</p>
+            </div>
+            <div className="flex items-center gap-1 border-r-2 px-2">
               <p className="font-semibold">{book?.access_times}</p>
               <p>Luợt xem</p>
             </div>
             <div className="flex items-center gap-1 border-r-2 px-2">
               <p className="font-semibold">{book?.amount_borrowed}</p>
-              <p>Đã thuê</p>
+              <p>Lượt đã bán</p>
             </div>
             <div
               className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300"
