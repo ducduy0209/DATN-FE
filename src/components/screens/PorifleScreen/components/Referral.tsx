@@ -100,7 +100,8 @@ const Referral = () => {
     if (response.status === 200) {
       notify(NOTIFICATION_TYPE.SUCCESS, "Cập nhật email thành công!")
     } else {
-      notify(NOTIFICATION_TYPE.ERROR, "Có lỗi xảy ra, vui lòng thử lại!")
+      console.log({response})
+      notify(NOTIFICATION_TYPE.ERROR, "Email nhận hoa hồng chỉ được cập nhất 1 lần duy nhất!")
     }
   }
 

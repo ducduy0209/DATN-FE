@@ -135,7 +135,7 @@ const AdminHomePage = () => {
           </div>
           <div className="basis-1/3 rounded-lg bg-green-400 px-8 py-4 text-white">
             <p className="text-xl font-semibold">Tổng doanh thu</p>
-            <p className="text-3xl font-semibold">{analytics.totalRevenue}</p>
+            <p className="text-3xl font-semibold">${analytics.totalRevenue}</p>
           </div>
           <div className="basis-1/3 rounded-lg bg-green-400 px-8 py-4 text-white">
             <p className="text-xl font-semibold">Tổng số người dùng mới</p>
