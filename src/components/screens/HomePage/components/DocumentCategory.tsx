@@ -66,16 +66,19 @@ const DocumentCategory = () => {
 
   useEffect(() => {
     const handleFetchCategorys = async () => {
-      const response = await fetch(API_ENDPOINT + "/genres", {
+      const response = await fetch(API_ENDPOINT + "/genres?page=1&limit=8", {
         headers: { "Content-Type": "application/json" },
       })
-      const data = (await response.json()) as Response<Category[]>
-      if (!!data?.data?.length) {
-        setCategories(data.data)
+      const data = (await response.json()) as Response<any>
+      console.log(data)
+      if (!!data?.data?.results.length) {
+        setCategories(data.data.results)
       }
     }
     handleFetchCategorys()
   }, [])
+
+  console.log(catagories)
 
   useEffect(() => {
     const handleFetchBanners = async () => {
@@ -118,7 +121,7 @@ const DocumentCategory = () => {
       <div className="flex bg-green-400 px-40">
         <div className="relative h-[428px] w-72 bg-white">
           <div className="flex h-[428px] w-72 flex-col bg-white">
-            {catagories.slice(0, 8).map((category) => (
+            {catagories.map((category) => (
               <div
                 onClick={() => route.push(`/category/${category.slug}`)}
                 key={category.id}
@@ -128,9 +131,12 @@ const DocumentCategory = () => {
                 {category.name}
               </div>
             ))}
-            <div className="flex h-full cursor-pointer items-center justify-center gap-1 text-green-400 hover:text-green-500" onClick={() => route.push('/all-book/new')}>
+            <div
+              className="flex h-full cursor-pointer items-center justify-center gap-1 text-green-400 hover:text-green-500"
+              onClick={() => route.push("/all-book/new")}
+            >
               <Icon name="align-justify" />
-                Xem tất cả danh mục
+              Xem tất cả danh mục
             </div>
           </div>
         </div>

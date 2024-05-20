@@ -1,4 +1,5 @@
 import { Category } from "./category"
+import { User } from "./user"
 
 export type Borrow = {
   borrow_date: string
@@ -14,4 +15,5 @@ export type Borrow = {
   duration: string
   isExpired: boolean
   id: string
+  userId: User
 }
