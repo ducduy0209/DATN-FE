@@ -237,7 +237,7 @@ const BookScreen = ({ id }: Props) => {
         <div className="flex flex-col items-center gap-12">
           <Image src={`http://localhost:3000/img/books/${selectImage}`} width={200} className="rounded-none" />
           <CustomButton color="default" onClick={onOpen}>
-            Preview
+            Xem trước
           </CustomButton>
         </div>
         <div className="w-[80%]">
