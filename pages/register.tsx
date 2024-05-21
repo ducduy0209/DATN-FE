@@ -120,7 +120,7 @@ const Register = () => {
                 type="password"
                 name="password"
                 label="Password"
-                placeholder="Enter your password..."
+                placeholder="Nhập mật khẩu..."
                 onChange={handleChangeInput}
               />
               {errorMessage.password && <span className="text-red-600">{errorMessage.password}</span>}

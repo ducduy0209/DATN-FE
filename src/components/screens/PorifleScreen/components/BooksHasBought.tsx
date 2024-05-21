@@ -172,7 +172,7 @@ const BooksHasBought = () => {
               )}
             </TableBody>
           ) : (
-            <TableBody emptyContent={"Bạn chưa có lịch sử mượn sách."}>{[]}</TableBody>
+            <TableBody emptyContent={"Bạn chưa có lịch sử mua/mượn sách."}>{[]}</TableBody>
           )}
         </Table>
         {books?.totalPages && books.totalPages > 1 ? (

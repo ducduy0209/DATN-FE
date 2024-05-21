@@ -66,7 +66,7 @@ const PurchaseHistory = () => {
 
   return (
     <div className="px-12 py-10">
-      <p className="mb-8 text-xl font-semibold">Lịch sử mượn sách</p>
+      <p className="mb-8 text-xl font-semibold">Lịch sử mua/mượn sách</p>
       <Table aria-label="Example table with dynamic content">
         <TableHeader columns={columns}>
           {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
@@ -94,7 +94,7 @@ const PurchaseHistory = () => {
             )}
           </TableBody>
         ) : (
-          <TableBody emptyContent={"Bạn chưa có lịch sử mượn sách."}>{[]}</TableBody>
+          <TableBody emptyContent={"Bạn chưa có lịch sử mua/mượn sách."}>{[]}</TableBody>
         )}
       </Table>
       {borrows?.totalPages && borrows.totalPages > 1 ? (

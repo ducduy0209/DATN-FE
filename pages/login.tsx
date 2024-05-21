@@ -124,7 +124,7 @@ const Login = () => {
             <Input
               name="email"
               type="text"
-              placeholder="Enter your email"
+              placeholder="Nhập địa chỉ email"
               value={loginInfo.email}
               onChange={handleChangeLoginInfo}
             />
@@ -133,7 +133,7 @@ const Login = () => {
             <Input
               name="password"
               type="password"
-              placeholder="Enter your password"
+              placeholder="Nhập mật khẩu"
               value={loginInfo.password}
               ref={inputRef}
               onChange={handleChangeLoginInfo}
