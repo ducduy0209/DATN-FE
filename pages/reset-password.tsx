@@ -76,7 +76,7 @@ const ResetPassword = () => {
               type="password"
               name="password"
               label="Vui lòng nhập mật khẩu mới của bạn."
-              placeholder="Enter your password..."
+              placeholder="Nhập mật khẩu mới..."
               labelPlacement="outside"
               onChange={handleChangeInput}
             />
