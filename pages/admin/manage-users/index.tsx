@@ -24,6 +24,8 @@ import {
   TableHeader,
   TableRow,
   useDisclosure,
+  Image,
+  Checkbox,
 } from "@nextui-org/react"
 import { DatePicker } from "@nextui-org/date-picker"
 import { parseDate, getLocalTimeZone, DateValue } from "@internationalized/date"
@@ -77,20 +79,10 @@ const ManageUsers = () => {
   const [limit, setLimit] = useState<number>(5)
   const [isStaleData, setIsStaleData] = useState<boolean>(false)
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure()
-  const [bookSelected, setBookSelected] = useState<BookSelected>({
-    title: "",
-    author: "",
-    published_date: undefined,
-    isbn: "",
-    summary: "",
-    cover_image: "",
-    total_book_pages: 0,
-    digital_content: 0,
-    prices: [{ duration: "1 month", price: 0 }],
-    languange: BOOK_LANGUAGES.VI,
-    price: 0,
-  })
-  const [bookId, setBookId] = useState<string>("")
+  const [userSelected, setUserSelected] = useState<User | null>(null)
+  const [userId, setUserId] = useState<string>("")
+  const [previewImage, setPreviewImage] = useState<string>()
+  const [password, setPassword] = useState<string>("")
 
   const { authInfo } = useBoundStore((state) => ({
     authInfo: state.authInfo,
@@ -101,87 +93,82 @@ const ManageUsers = () => {
     setPage(1)
   }
 
-  // const handleDeleteBook = async (bookId: string) => {
-  //   const response = await fetch(API_ENDPOINT + `/books/${bookId}`, {
-  //     method: "DELETE",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //       authorization: `Bearer ${authInfo.access?.token}`,
-  //     },
-  //   })
-  //   if (response.status === 204) {
-  //     notify(NOTIFICATION_TYPE.SUCCESS, "Sách đã được xoá thành công")
-  //     setIsStaleData(!isStaleData)
-  //   } else {
-  //     notify(NOTIFICATION_TYPE.ERROR, "Có lỗi xảy ra, vui lòng thử lại")
-  //   }
-  // }
+  const handleDeleteUser = async (userId: string) => {
+    const response = await fetch(API_ENDPOINT + `/users/${userId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${authInfo.access?.token}`,
+      },
+    })
+    if (response.status === 204) {
+      notify(NOTIFICATION_TYPE.SUCCESS, "Tài khoản đã được xoá thành công")
+      setIsStaleData(!isStaleData)
+    } else {
+      notify(NOTIFICATION_TYPE.ERROR, "Có lỗi xảy ra, vui lòng thử lại")
+    }
+  }
 
-  // const handleFetchBook = async (slug: string) => {
-  //   const response = await fetch(API_ENDPOINT + `/books/search/${slug}`)
-  //   const raw = (await response.json()) as Response<{ book: Book }>
-  //   if (raw.data?.book) {
-  //     const newBookSelected = raw.data.book
-  //     setBookId(newBookSelected.id)
-  //     setBookSelected({
-  //       title: newBookSelected.title,
-  //       author: newBookSelected.author,
-  //       published_date: newBookSelected.published_date.toString(),
-  //       isbn: newBookSelected.isbn,
-  //       summary: newBookSelected.summary,
-  //       cover_image: newBookSelected.cover_image,
-  //       total_book_pages: newBookSelected.total_book_pages,
-  //       digital_content: newBookSelected.digital_content,
-  //       prices: [{ duration: "", price: 0 }],
-  //       languange: newBookSelected.languange,
-  //       price: newBookSelected.price,
-  //     })
-  //   }
-  // }
+  const handleUpdateUser = async () => {
+    const response = await fetch(API_ENDPOINT + `/users/${userId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${authInfo.access?.token}`,
+      },
+      body: JSON.stringify({
+        name: userSelected?.name,
+        email: userSelected?.email,
+        role: userSelected?.role,
+        isActive: userSelected?.isActive,
+        isEmailVerified: userSelected?.isEmailVerified,
+        image: previewImage,
+      }),
+    })
+    if (response.status === 200) {
+      notify(NOTIFICATION_TYPE.SUCCESS, "Cập nhật thông tin sách thành công")
+      handleCloseModal()
+      setIsStaleData(!isStaleData)
+    } else {
+      handleCloseModal()
+      const raw = (await response.json()) as Response<any>
+      notify(NOTIFICATION_TYPE.ERROR, raw?.message ? raw?.message : "Có lỗi xảy ra, vui lòng thử lại")
+    }
+  }
 
-  // const handleUpdateBook = async () => {
-  //   const response = await fetch(API_ENDPOINT + `/books/${bookId}`, {
-  //     method: "PATCH",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //       authorization: `Bearer ${authInfo.access?.token}`,
-  //     },
-  //     body: JSON.stringify({
-  //       ...bookSelected,
-  //     }),
-  //   })
-  //   if (response.status === 200) {
-  //     notify(NOTIFICATION_TYPE.SUCCESS, "Cập nhật thông tin sách thành công")
-  //     setIsStaleData(!isStaleData)
-  //   } else {
-  //     notify(NOTIFICATION_TYPE.ERROR, "Có lỗi xảy ra, vui lòng thử lại")
-  //   }
-  // }
-
-  // const handleCreateBook = async () => {
-  //   const response = await fetch(API_ENDPOINT + `/books`, {
-  //     method: "CREATE",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //       authorization: `Bearer ${authInfo.access?.token}`,
-  //     },
-  //     body: JSON.stringify({
-  //       ...bookSelected,
-  //     }),
-  //   })
-  //   if (response.status === 200) {
-  //     notify(NOTIFICATION_TYPE.SUCCESS, "Cập nhật thông tin sách thành công")
-  //     setIsStaleData(!isStaleData)
-  //   } else {
-  //     notify(NOTIFICATION_TYPE.ERROR, "Có lỗi xảy ra, vui lòng thử lại")
-  //   }
-  // }
+  const handleCreateUser = async () => {
+    const response = await fetch(API_ENDPOINT + `/users`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${authInfo.access?.token}`,
+      },
+      body: JSON.stringify({
+        name: userSelected?.name,
+        email: userSelected?.email,
+        role: userSelected?.role,
+        my_refer_code: userSelected?.my_refer_code,
+        isEmailVerified: userSelected?.isEmailVerified,
+        image: previewImage,
+        password,
+      }),
+    })
+    if (response.status === 201) {
+      notify(NOTIFICATION_TYPE.SUCCESS, "Tạo tài khoản thành công")
+      setIsStaleData(!isStaleData)
+    } else {
+      const raw = (await response.json()) as Response<any>
+      notify(NOTIFICATION_TYPE.ERROR, raw?.message ? raw.message : "Có lỗi xảy ra, vui lòng thử lại")
+    }
+    handleCloseModal()
+    setPassword("")
+  }
 
   useEffect(() => {
     const handleFetchBook = async () => {
       let params = `/users?page=${page}&limit=${limit}`
       if (search) {
-        params += `&search=${search}`
+        params += `&name=${search}`
       }
       const response = await fetch(API_ENDPOINT + params, {
         headers: {
@@ -197,48 +184,48 @@ const ManageUsers = () => {
     handleFetchBook()
   }, [page, search, isStaleData])
 
-  // const handleEdit = (slug: string) => {
-  //   handleFetchBook(slug)
-  //   onOpen()
-  // }
+  const handleEdit = (user: User) => {
+    setUserSelected(user)
+    setUserId(user?.id?.toString() ?? "")
+    onOpen()
+  }
 
-  // const handleChangeBookSelected = (e: ChangeEvent<HTMLInputElement>) => {
-  //   const name = e.target.name
-  //   const value = e.target.value
-  //   setBookSelected({
-  //     ...bookSelected,
-  //     [name]: value,
-  //   })
-  // }
+  const handleChangeUserSelected = (e: ChangeEvent<HTMLInputElement>) => {
+    const name = e.target.name
+    const value = e.target.value
+    setUserSelected({
+      ...userSelected,
+      [name]: value,
+    })
+  }
 
-  // const handleChangeDate = (e: DateValue) => {
-  //   setBookSelected({
-  //     ...bookSelected,
-  //     published_date: e.toString(),
-  //   })
-  // }
+  const handleCloseModal = () => {
+    setUserId("")
+    setUserSelected(null)
+    setPreviewImage("")
+    onClose()
+  }
 
-  // const handleCloseModal = () => {
-  //   setBookId("")
-  //   setBookSelected({
-  //     title: "",
-  //     author: "",
-  //     published_date: undefined,
-  //     isbn: "",
-  //     summary: "",
-  //     cover_image: "",
-  //     total_book_pages: 0,
-  //     digital_content: 0,
-  //     prices: [{ duration: "", price: 0 }],
-  //     languange: BOOK_LANGUAGES.VI,
-  //     price: 0,
-  //   })
-  //   onClose()
-  // }
+  const handleUploadFile = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const selectedFile = e.target.files[0]
+      const reader = new FileReader()
+
+      reader.onload = () => {
+        const dataUrl = reader.result as string
+        console.log(dataUrl)
+        setPreviewImage(dataUrl)
+      }
+
+      if (selectedFile) {
+        reader.readAsDataURL(selectedFile)
+      }
+    }
+  }
 
   return (
     <AdminLayout>
-      {/* <Modal
+      <Modal
         isOpen={isOpen}
         onClose={handleCloseModal}
         onOpenChange={onOpenChange}
@@ -249,45 +236,69 @@ const ManageUsers = () => {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">{bookId ? "Update Book" : "Create New Book"}</ModalHeader>
+              <ModalHeader className="flex flex-col gap-1">
+                {userId ? "Update Account" : "Create New Account"}
+              </ModalHeader>
               <ModalBody>
-                {Object.entries(bookSelected).map((item) => (
-                  <>
-                    {item[0] === "published_date" ? (
-                      <DatePicker label="Published Date" onChange={handleChangeDate} />
-                    ) : item[0] === "prices" ? (
-                      <div>
-                        <p className="text-sm">Prices</p>
-                        {Object.values(item[1]).map((i) => (
-                          <Input
-                            label={i.duration}
-                            value={i.price}
-                            name={`prices_${i.duration}_${i.price}`}
-                            onChange={handleChangeBookSelected}
-                          />
-                        ))}
-                      </div>
-                    ) : (
-                      <Input
-                        label={(item[0].slice(0, 1).toUpperCase() + item[0].slice(1)).replace("_", " ")}
-                        value={item[1].toString()}
-                        name={item[0]}
-                        onChange={handleChangeBookSelected}
-                      />
-                    )}
-                  </>
-                ))}
+                <Input label="Name" name="name" value={userSelected?.name} onChange={handleChangeUserSelected} />
+                <Input label="Email" name="email" value={userSelected?.email} onChange={handleChangeUserSelected} />
+                {!userId && (
+                  <Input
+                    label="Password"
+                    name="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                )}
+                <div className="flex items-center gap-2">
+                  <p className="text-sm">Role</p>
+                  <CustomButton
+                    isGhost={userSelected?.role !== ROLE_ACCOUNT.USER}
+                    onClick={() => setUserSelected({ ...userSelected, role: ROLE_ACCOUNT.USER })}
+                  >
+                    USER
+                  </CustomButton>
+                  <CustomButton
+                    isGhost={userSelected?.role !== ROLE_ACCOUNT.ADMIN}
+                    onClick={() => setUserSelected({ ...userSelected, role: ROLE_ACCOUNT.ADMIN })}
+                  >
+                    ADMIN
+                  </CustomButton>
+                </div>
+                <p className="-mb-2 text-sm">Ảnh đại diện của bạn</p>
+                <input type="file" name="image" accept="image/*" onChange={handleUploadFile} />
+                {previewImage ? (
+                  <Image src={previewImage} alt="Ảnh đại diện" width={200} />
+                ) : (
+                  userSelected?.image && <Image src={userSelected?.image} width={200} />
+                )}
+                {userId && (
+                  <Checkbox
+                    isSelected={userSelected?.isActive}
+                    onValueChange={(isSelected: boolean) => setUserSelected({ ...userSelected, isActive: isSelected })}
+                  >
+                    Active
+                  </Checkbox>
+                )}
+                <Checkbox
+                  isSelected={userSelected?.isEmailVerified}
+                  onValueChange={(isSelected: boolean) =>
+                    setUserSelected({ ...userSelected, isEmailVerified: isSelected })
+                  }
+                >
+                  Verify Email
+                </Checkbox>
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={handleCloseModal}>
                   Close
                 </Button>
-                {bookId ? (
-                  <CustomButton color="green" onPress={handleUpdateBook}>
+                {userId ? (
+                  <CustomButton color="green" onPress={handleUpdateUser}>
                     Update
                   </CustomButton>
                 ) : (
-                  <CustomButton color="green" onPress={handleCreateBook}>
+                  <CustomButton color="green" onPress={handleCreateUser}>
                     Create
                   </CustomButton>
                 )}
@@ -295,7 +306,7 @@ const ManageUsers = () => {
             </>
           )}
         </ModalContent>
-      </Modal> */}
+      </Modal>
       <div className="px-8 py-4">
         <div className="mb-8 flex items-center gap-4">
           <Input label="Search by name" size="sm" onChange={handleChangeSearch} />
@@ -340,17 +351,13 @@ const ManageUsers = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">
-                        <Chip
-                          color="success"
-                          className="cursor-pointer text-white"
-                          // onClick={() => handleEdit(item.slug)}
-                        >
+                        <Chip color="success" className="cursor-pointer text-white" onClick={() => handleEdit(item)}>
                           Edit
                         </Chip>
                         <Chip
                           color="danger"
                           className="cursor-pointer"
-                          // onClick={() => handleDeleteBook(item.id)}
+                          onClick={() => handleDeleteUser(item?.id?.toString() ?? "")}
                         >
                           Delete
                         </Chip>
