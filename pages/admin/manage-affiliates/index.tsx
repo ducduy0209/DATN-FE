@@ -45,10 +45,6 @@ const columns: Column[] = [
     uid: "commission_amount",
     name: "Tổng số tiền hoa hồng",
   },
-  {
-    uid: "action",
-    name: "Action",
-  },
 ]
 
 const Affiliates = () => {
@@ -71,7 +67,7 @@ const Affiliates = () => {
 
   useEffect(() => {
     const handleFetchReferrals = async () => {
-      const response = await fetch(API_ENDPOINT + `/affiliates`, {
+      const response = await fetch(API_ENDPOINT + `/affiliates?name=${search}`, {
         headers: { "Content-Type": "application/json", authorization: `Bearer ${authInfo.access?.token}` },
       })
       const data = (await response.json()) as Response<any>
@@ -82,7 +78,7 @@ const Affiliates = () => {
       }
     }
     handleFetchReferrals()
-  }, [page])
+  }, [page, search])
 
   console.log(referrals)
 
@@ -149,9 +145,6 @@ const Affiliates = () => {
       <div className="px-8 py-4">
         <div className="mb-8 flex items-center gap-4">
           <Input label="Search by name" size="sm" onChange={handleChangeSearch} />
-          <CustomButton color="green" onClick={onOpen}>
-            Add New
-          </CustomButton>
         </div>
         <div>
           <div className="mb-4 flex items-center justify-between">
@@ -181,24 +174,6 @@ const Affiliates = () => {
                     <TableCell>{item.purchase_count}</TableCell>
                     <TableCell>${item.commission_paid}</TableCell>
                     <TableCell>${item.commission_amount}</TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Chip
-                          color="success"
-                          className="cursor-pointer text-white"
-                          // onClick={() => handleEdit(item.slug)}
-                        >
-                          Edit
-                        </Chip>
-                        <Chip
-                          color="danger"
-                          className="cursor-pointer"
-                          // onClick={() => handleDeleteBook(item.id)}
-                        >
-                          Delete
-                        </Chip>
-                      </div>
-                    </TableCell>
                   </TableRow>
                 )}
               </TableBody>

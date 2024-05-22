@@ -23,6 +23,7 @@ import {
   TableHeader,
   TableRow,
   useDisclosure,
+  Image,
 } from "@nextui-org/react"
 import { DatePicker } from "@nextui-org/date-picker"
 import { parseDate, getLocalTimeZone, DateValue } from "@internationalized/date"
@@ -88,11 +89,18 @@ const ManageBooks = () => {
     cover_image: "",
     total_book_pages: 0,
     digital_content: 0,
-    prices: [{ duration: "1 month", price: 0 }],
+    prices: [
+      { duration: "1 month", price: 0 },
+      { duration: "3 month", price: 0 },
+      { duration: "6 month", price: 0 },
+      { duration: "forever", price: 0 },
+    ],
     languange: BOOK_LANGUAGES.VI,
     price: 0,
   })
   const [bookId, setBookId] = useState<string>("")
+  const [previewImage, setPreviewImage] = useState<string>()
+  const [fileImage, setFileImage] = useState<any>()
 
   const { authInfo } = useBoundStore((state) => ({
     authInfo: state.authInfo,
@@ -161,15 +169,26 @@ const ManageBooks = () => {
   }
 
   const handleCreateBook = async () => {
+    const data = new FormData()
+    data.append("title", bookSelected.title)
+    data.append("author", bookSelected.author)
+    data.append("published_date", bookSelected?.published_date?.toString() + "")
+    data.append("isbn", bookSelected.isbn)
+    data.append("summary", bookSelected.summary)
+    data.append("cover_image", fileImage)
+    data.append("total_book_pages", bookSelected.total_book_pages + "")
+    data.append("digital_content", bookSelected.digital_content + "")
+    bookSelected.prices.forEach((price, index) => {
+      data.append(`prices[${index}][duration]`, price.duration)
+      data.append(`prices[${index}][price]`, price.price + "")
+    })
     const response = await fetch(API_ENDPOINT + `/books`, {
-      method: "CREATE",
+      method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "multipart/form-data",
         authorization: `Bearer ${authInfo.access?.token}`,
       },
-      body: JSON.stringify({
-        ...bookSelected,
-      }),
+      body: data,
     })
     if (response.status === 200) {
       notify(NOTIFICATION_TYPE.SUCCESS, "Cập nhật thông tin sách thành công")
@@ -208,10 +227,31 @@ const ManageBooks = () => {
   const handleChangeBookSelected = (e: ChangeEvent<HTMLInputElement>) => {
     const name = e.target.name
     const value = e.target.value
-    setBookSelected({
-      ...bookSelected,
-      [name]: value,
-    })
+    const parts = name.split("-")
+    console.log(name)
+    console.log(parts, value)
+    if (parts.length === 1) {
+      setBookSelected({
+        ...bookSelected,
+        [name]: value,
+      })
+    } else if (parts[0] === "prices") {
+      const newPrices = bookSelected.prices.map((price) => {
+        if (price.duration === parts[1]) {
+          return {
+            duration: price.duration,
+            price: value,
+          }
+        } else {
+          return price
+        }
+      })
+      console.log(newPrices)
+      setBookSelected({
+        ...bookSelected,
+        prices: newPrices as any,
+      })
+    }
   }
 
   const handleChangeDate = (e: DateValue) => {
@@ -232,11 +272,36 @@ const ManageBooks = () => {
       cover_image: "",
       total_book_pages: 0,
       digital_content: 0,
-      prices: [{ duration: "", price: 0 }],
+      prices: [
+        { duration: "1 month", price: 0 },
+        { duration: "3 month", price: 0 },
+        { duration: "6 month", price: 0 },
+        { duration: "forever", price: 0 },
+      ],
       languange: BOOK_LANGUAGES.VI,
       price: 0,
     })
+    setFileImage("")
+    setPreviewImage("")
     onClose()
+  }
+
+  const handleUploadFile = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const selectedFile = e.target.files[0]
+      const reader = new FileReader()
+      setFileImage(selectedFile)
+
+      reader.onload = () => {
+        const dataUrl = reader.result as string
+        console.log(dataUrl)
+        setPreviewImage(dataUrl)
+      }
+
+      if (selectedFile) {
+        reader.readAsDataURL(selectedFile)
+      }
+    }
   }
 
   return (
@@ -263,12 +328,55 @@ const ManageBooks = () => {
                         <p className="text-sm">Prices</p>
                         {Object.values(item[1]).map((i) => (
                           <Input
-                            label={i.duration}
-                            value={i.price}
-                            name={`prices_${i.duration}_${i.price}`}
+                            label={i?.duration}
+                            value={i?.price}
+                            className="my-2"
+                            name={`prices-${i?.duration}`}
                             onChange={handleChangeBookSelected}
                           />
                         ))}
+                      </div>
+                    ) : item[0] === "price" ? (
+                      <Input
+                        label={(item[0].slice(0, 1).toUpperCase() + item[0].slice(1)).replace("_", " ")}
+                        value={bookSelected?.prices[0]?.price.toString()}
+                        name={item[0]}
+                        isDisabled
+                      />
+                    ) : item[0] === "cover_image" ? (
+                      <div>
+                        <p className="text-sm">Ảnh bìa</p>
+                        <input type="file" name="image" accept="image/*" onChange={handleUploadFile} />
+                        {previewImage ? (
+                          <Image src={previewImage} alt="Ảnh đại diện" width={200} />
+                        ) : (
+                          bookSelected?.cover_image && <Image src={bookSelected?.cover_image} width={200} />
+                        )}
+                      </div>
+                    ) : item[0] === "languange" ? (
+                      <div>
+                        <p className="text-sm">Select Language</p>
+                        <Dropdown>
+                          <DropdownTrigger>
+                            <Button variant="bordered">
+                              {bookSelected.languange === BOOK_LANGUAGES.VI ? "Tiếng việt" : "Tiếng anh"}
+                            </Button>
+                          </DropdownTrigger>
+                          <DropdownMenu aria-label="Static Actions">
+                            <DropdownItem
+                              key="new"
+                              onPress={() => setBookSelected({ ...bookSelected, languange: BOOK_LANGUAGES.VI })}
+                            >
+                              Tiếng việt
+                            </DropdownItem>
+                            <DropdownItem
+                              key="copy"
+                              onPress={() => setBookSelected({ ...bookSelected, languange: BOOK_LANGUAGES.EN })}
+                            >
+                              Tiếng Anh
+                            </DropdownItem>
+                          </DropdownMenu>
+                        </Dropdown>
                       </div>
                     ) : (
                       <Input
