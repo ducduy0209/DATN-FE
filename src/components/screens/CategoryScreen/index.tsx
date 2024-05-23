@@ -21,6 +21,7 @@ import { Response } from "@models/api"
 import { useRouter } from "next/router"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
+import { LANGUAGE, Price } from "../AllBookScreen"
 
 type Props = {
   category: string
@@ -42,6 +43,31 @@ const CategoryScreen = ({ category }: Props) => {
   const route = useRouter()
   const [isOpenSort, setIsOpenSort] = useState<boolean>(false)
   const searchParams = useSearchParams()
+  const [lang, setLang] = useState<LANGUAGE>()
+  const [price, setPrice] = useState<Price>({
+    to: undefined,
+    from: "0",
+  })
+
+  const handleChangePrice = (e: ChangeEvent<HTMLInputElement>) => {
+    const name = e.target.name
+    const value = e.target.value
+    const regex = /^[+]?((0|[1-9]\d*)(\.\d*)?|(\.\d+))$/
+    if (regex.test(value) || value === "") {
+      if (name === "from") {
+        setPrice({
+          ...price,
+          from: value,
+        })
+      }
+      if (name === "to") {
+        setPrice({
+          ...price,
+          to: value,
+        })
+      }
+    }
+  }
 
   const handleSort = (sortBy: string, sortType: string) => {
     setSortBy(sortBy)
@@ -84,9 +110,18 @@ const CategoryScreen = ({ category }: Props) => {
   useEffect(() => {
     if (category) {
       const handleFetchBooks = async () => {
-        let params = `/books/genres/${category}`
+        let params = `/books/genres/${category}?`
+        if (price?.from) {
+          params += `fromPrice=${price.from}`
+        }
+        if (price?.to) {
+          params += `&toPrice=${price.to}`
+        }
         if (sortBy && sortType) {
-          params += `?sortBy=${sortBy}:${sortType}`
+          params += `&sortBy=${sortBy}:${sortType}`
+        }
+        if (lang) {
+          params += `&language=${lang}`
         }
         const response = await fetch(API_ENDPOINT + params, {
           headers: { "Content-Type": "application/json" },
@@ -99,7 +134,7 @@ const CategoryScreen = ({ category }: Props) => {
       }
       handleFetchBooks()
     }
-  }, [category, sortBy, sortType])
+  }, [category, sortBy, sortType, lang, price])
 
   useEffect(() => {
     const handleFetchCategorys = async () => {
@@ -137,8 +172,17 @@ const CategoryScreen = ({ category }: Props) => {
             ))}
           <p className="py-4 text-lg">Theo ngôn ngữ</p>
           <div className="flex gap-2">
-            <CustomButton>Tiếng Việt</CustomButton>
-            <CustomButton>Tiếng Anh</CustomButton>
+            <CustomButton onClick={() => setLang(LANGUAGE.VI)} isGhost={lang !== LANGUAGE.VI}>
+              Tiếng Việt
+            </CustomButton>
+            <CustomButton onClick={() => setLang(LANGUAGE.EN)} isGhost={lang !== LANGUAGE.EN}>
+              Tiếng Anh
+            </CustomButton>
+          </div>
+          <p className="py-4 text-lg">Theo giá</p>
+          <div className="flex gap-2">
+            <Input label="Từ" value={price.from} startContent="$" name="from" onChange={handleChangePrice} />
+            <Input label="Đến" value={price.to} startContent="$" name="to" onChange={handleChangePrice} />
           </div>
         </div>
         <div className="w-full">
