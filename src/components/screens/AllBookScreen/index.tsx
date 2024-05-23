@@ -25,12 +25,12 @@ enum MAPPING_TYPE {
   "bestSeller" = "Best seller",
 }
 
-enum LANGUAGE {
+export enum LANGUAGE {
   VI = "vi",
   EN = "en",
 }
 
-type Price = {
+export type Price = {
   from?: string
   to?: string
 }
@@ -116,12 +116,13 @@ const AllBookScreen = ({ type }: Props) => {
 
   useEffect(() => {
     const handleFetchCategorys = async () => {
-      const response = await fetch(API_ENDPOINT + "/genres", {
+      const response = await fetch(API_ENDPOINT + "/genres?page=1&limit=8", {
         headers: { "Content-Type": "application/json" },
       })
-      const data = (await response.json()) as Response<Category[]>
-      if (!!data?.data?.length) {
-        setCategories(data.data)
+      const data = (await response.json()) as Response<any>
+      console.log(data)
+      if (!!data?.data?.results.length) {
+        setCategories(data.data.results)
       }
     }
     handleFetchCategorys()
