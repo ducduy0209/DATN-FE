@@ -3,6 +3,7 @@ import { API_ENDPOINT, DataWithPagination } from "@models/api"
 import { BOOK_LANGUAGES, Book } from "@models/book"
 import {
   Button,
+  Checkbox,
   Chip,
   Dropdown,
   DropdownItem,
@@ -117,6 +118,7 @@ const ManageBanners = () => {
       body: JSON.stringify({
         name: bannerSelected.name,
         image: bannerSelected.image,
+        isActive: bannerSelected.isActive,
       }),
     })
     if (response.status === 200) {
@@ -243,6 +245,13 @@ const ManageBanners = () => {
                 ) : (
                   bannerSelected?.image && <Image src={bannerSelected?.image} width={200} />
                 )}
+                <div
+                  className="flex cursor-pointer items-center gap-1"
+                  onClick={() => setBannerSelected({ ...bannerSelected, isActive: !bannerSelected.isActive })}
+                >
+                  <Checkbox isSelected={bannerSelected.isActive} />
+                  <p>Active</p>
+                </div>
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={handleCloseModal}>
