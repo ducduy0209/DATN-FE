@@ -27,7 +27,7 @@ const DropDownMenu = () => {
       <div className="p-8 text-center">
         <div className="flex flex-col items-center gap-1 text-center text-sm font-normal text-gray-400">
           {accountInfo?.image ? (
-            <Avatar size="sm" src={accountInfo?.image} isBordered color="success" />
+            <Avatar size="sm" src={`  http://localhost:3000/img/users/${accountInfo?.image}`} name={accountInfo?.name} isBordered color="success" />
           ) : (
             <Avatar size="sm" name={accountInfo?.name} isBordered color="success" />
           )}

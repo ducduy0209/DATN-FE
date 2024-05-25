@@ -1,6 +1,6 @@
-import { AdminLayout } from "@components/layouts/adminLayout"
-import { API_ENDPOINT, DataWithPagination } from "@models/api"
-import { BOOK_LANGUAGES, Book } from "@models/book"
+import { AdminLayout } from "@components/layouts/adminLayout";
+import { API_ENDPOINT, DataWithPagination } from "@models/api";
+import { ROLE_ACCOUNT, User } from "@models/user";
 import {
   Avatar,
   Button,
@@ -26,72 +26,50 @@ import {
   useDisclosure,
   Image,
   Checkbox,
-} from "@nextui-org/react"
-import { DatePicker } from "@nextui-org/date-picker"
-import { parseDate, getLocalTimeZone, DateValue } from "@internationalized/date"
-import React, { ChangeEvent, useEffect, useState } from "react"
-import { Response } from "@models/api"
-import { CustomButton } from "@components/common/CustomButton"
-import moment from "moment"
-import Icon from "@components/icons"
-import { useBoundStore } from "@zustand/total"
-import { NOTIFICATION_TYPE, notify } from "@utils/notify"
-import { Category } from "@models/category"
-import { ROLE_ACCOUNT, User } from "@models/user"
+} from "@nextui-org/react";
+import React, { ChangeEvent, useEffect, useState } from "react";
+import { Response } from "@models/api";
+import { CustomButton } from "@components/common/CustomButton";
+import moment from "moment";
+import Icon from "@components/icons";
+import { useBoundStore } from "@zustand/total";
+import { NOTIFICATION_TYPE, notify } from "@utils/notify";
 
 type Column = {
-  name: string
-  uid: string
-}
-
-type Price = {
-  duration: string
-  price: number
-}
-
-type BookSelected = {
-  title: string
-  author: string
-  published_date?: string
-  isbn: string
-  summary: string
-  cover_image: string
-  total_book_pages: number
-  digital_content: number
-  prices: Price[]
-  languange: BOOK_LANGUAGES
-  price: number
-}
+  name: string;
+  uid: string;
+};
 
 const columns: Column[] = [
-  { name: "NAME", uid: "name" },
+  { name: "TÊN", uid: "name" },
   { name: "EMAIL", uid: "email" },
-  { name: "ROLE", uid: "role" },
-  { name: "REFER CODE", uid: "refer_code" },
-  { name: "IS EMAIL VERIFIED", uid: "is_email_verified" },
-  { name: "ACTION", uid: "action" },
-]
+  { name: "QUYỀN", uid: "role" },
+  { name: "MÃ TIẾP THỊ", uid: "refer_code" },
+  { name: "XÁC MINH EMAIL", uid: "is_email_verified" },
+  { name: "HÀNH ĐỘNG", uid: "action" },
+];
 
 const ManageUsers = () => {
-  const [search, setSearch] = useState<string>("")
-  const [page, setPage] = useState<number>(1)
-  const [users, setBooks] = useState<DataWithPagination<User[]>>()
-  const [limit, setLimit] = useState<number>(5)
-  const [isStaleData, setIsStaleData] = useState<boolean>(false)
-  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure()
-  const [userSelected, setUserSelected] = useState<User | null>(null)
-  const [userId, setUserId] = useState<string>("")
-  const [previewImage, setPreviewImage] = useState<string>()
-  const [password, setPassword] = useState<string>("")
+  const [search, setSearch] = useState<string>("");
+  const [page, setPage] = useState<number>(1);
+  const [users, setUsers] = useState<DataWithPagination<User[]>>();
+  const [limit, setLimit] = useState<number>(5);
+  const [isStaleData, setIsStaleData] = useState<boolean>(false);
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+  const [userSelected, setUserSelected] = useState<User | null>(null);
+  const [userId, setUserId] = useState<string>("");
+  const [previewImage, setPreviewImage] = useState<string>();
+  const [fileImage, setFileImage] = useState<any>();
+  const [password, setPassword] = useState<string>("");
 
   const { authInfo } = useBoundStore((state) => ({
     authInfo: state.authInfo,
-  }))
+  }));
 
   const handleChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value)
-    setPage(1)
-  }
+    setSearch(e.target.value);
+    setPage(1);
+  };
 
   const handleDeleteUser = async (userId: string) => {
     const response = await fetch(API_ENDPOINT + `/users/${userId}`, {
@@ -100,128 +78,139 @@ const ManageUsers = () => {
         "Content-Type": "application/json",
         authorization: `Bearer ${authInfo.access?.token}`,
       },
-    })
+    });
     if (response.status === 204) {
-      notify(NOTIFICATION_TYPE.SUCCESS, "Tài khoản đã được xoá thành công")
-      setIsStaleData(!isStaleData)
+      notify(NOTIFICATION_TYPE.SUCCESS, "Tài khoản đã được xoá thành công");
+      setIsStaleData(!isStaleData);
     } else {
-      notify(NOTIFICATION_TYPE.ERROR, "Có lỗi xảy ra, vui lòng thử lại")
+      notify(NOTIFICATION_TYPE.ERROR, "Có lỗi xảy ra, vui lòng thử lại");
     }
-  }
+  };
 
   const handleUpdateUser = async () => {
+    const data = new FormData();
+    data.append("name", userSelected?.name || "");
+    data.append("email", userSelected?.email || "");
+    data.append("role", userSelected?.role || "");
+    data.append("isActive", userSelected?.isActive ? "true" : "false");
+    data.append("isEmailVerified", userSelected?.isEmailVerified ? "true" : "false");
+    if (previewImage && fileImage) {
+      data.append("image", fileImage);
+    } else {
+      data.append("image", userSelected?.image || "");
+    }
+
     const response = await fetch(API_ENDPOINT + `/users/${userId}`, {
       method: "PATCH",
       headers: {
-        "Content-Type": "application/json",
         authorization: `Bearer ${authInfo.access?.token}`,
       },
-      body: JSON.stringify({
-        name: userSelected?.name,
-        email: userSelected?.email,
-        role: userSelected?.role,
-        isActive: userSelected?.isActive,
-        isEmailVerified: userSelected?.isEmailVerified,
-        image: previewImage,
-      }),
-    })
+      body: data,
+    });
+
     if (response.status === 200) {
-      notify(NOTIFICATION_TYPE.SUCCESS, "Cập nhật thông tin sách thành công")
-      handleCloseModal()
-      setIsStaleData(!isStaleData)
+      notify(NOTIFICATION_TYPE.SUCCESS, "Cập nhật thông tin người dùng thành công");
+      handleCloseModal();
+      setIsStaleData(!isStaleData);
     } else {
-      handleCloseModal()
-      const raw = (await response.json()) as Response<any>
-      notify(NOTIFICATION_TYPE.ERROR, raw?.message ? raw?.message : "Có lỗi xảy ra, vui lòng thử lại")
+      handleCloseModal();
+      const raw = (await response.json()) as Response<any>;
+      notify(NOTIFICATION_TYPE.ERROR, raw?.message ? raw?.message : "Có lỗi xảy ra, vui lòng thử lại");
     }
-  }
+  };
 
   const handleCreateUser = async () => {
+    const data = new FormData();
+    data.append("name", userSelected?.name || "");
+    data.append("email", userSelected?.email || "");
+    data.append("role", userSelected?.role || "");
+    data.append("isEmailVerified", userSelected?.isEmailVerified ? "true" : "false");
+    data.append("password", password);
+    if (fileImage) {
+      data.append("image", fileImage);
+    }
+
+    console.log("FormData values:");
+    data.forEach((value, key) => {
+      console.log(key, value);
+    });
+
     const response = await fetch(API_ENDPOINT + `/users`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        authorization: `Bearer ${authInfo.access?.token}`,
+        authorization: `Bearer ${authInfo.access?.token}`
       },
-      body: JSON.stringify({
-        name: userSelected?.name,
-        email: userSelected?.email,
-        role: userSelected?.role,
-        my_refer_code: userSelected?.my_refer_code,
-        isEmailVerified: userSelected?.isEmailVerified,
-        image: previewImage,
-        password,
-      }),
-    })
+      body: data,
+    });
+
     if (response.status === 201) {
-      notify(NOTIFICATION_TYPE.SUCCESS, "Tạo tài khoản thành công")
-      setIsStaleData(!isStaleData)
+      notify(NOTIFICATION_TYPE.SUCCESS, "Tạo tài khoản thành công");
+      setIsStaleData(!isStaleData);
     } else {
-      const raw = (await response.json()) as Response<any>
-      notify(NOTIFICATION_TYPE.ERROR, raw?.message ? raw.message : "Có lỗi xảy ra, vui lòng thử lại")
+      const raw = (await response.json()) as Response<any>;
+      notify(NOTIFICATION_TYPE.ERROR, raw?.message ? raw.message : "Có lỗi xảy ra, vui lòng thử lại");
     }
-    handleCloseModal()
-    setPassword("")
-  }
+    handleCloseModal();
+    setPassword("");
+  };
 
   useEffect(() => {
     const handleFetchUsers = async () => {
-      let params = `/users?page=${page}&limit=${limit}`
+      let params = `/users?page=${page}&limit=${limit}`;
       if (search) {
-        params += `&name=${search}`
+        params += `&name=${search}`;
       }
       const response = await fetch(API_ENDPOINT + params, {
         headers: {
           authorization: `Bearer ${authInfo?.access?.token}`,
         },
-      })
-      const raw = (await response.json()) as Response<any>
-      console.log(raw)
+      });
+      const raw = (await response.json()) as Response<any>;
       if (raw.status === "success") {
-        setBooks(raw.data.result as DataWithPagination<User[]>)
+        setUsers(raw.data.result as DataWithPagination<User[]>);
       }
-    }
-    handleFetchUsers()
-  }, [page, search, isStaleData])
+    };
+    handleFetchUsers();
+  }, [page, search, isStaleData]);
 
   const handleEdit = (user: User) => {
-    setUserSelected(user)
-    setUserId(user?.id?.toString() ?? "")
-    onOpen()
-  }
+    setUserSelected(user);
+    setUserId(user?.id?.toString() ?? "");
+    onOpen();
+  };
 
   const handleChangeUserSelected = (e: ChangeEvent<HTMLInputElement>) => {
-    const name = e.target.name
-    const value = e.target.value
+    const name = e.target.name;
+    const value = e.target.value;
     setUserSelected({
       ...userSelected,
       [name]: value,
-    })
-  }
+    });
+  };
 
   const handleCloseModal = () => {
-    setUserId("")
-    setUserSelected(null)
-    setPreviewImage("")
-    onClose()
-  }
+    setUserId("");
+    setUserSelected(null);
+    setPreviewImage("");
+    onClose();
+  };
 
   const handleUploadFile = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      const selectedFile = e.target.files[0]
-      const reader = new FileReader()
+      const selectedFile = e.target.files[0];
+      const reader = new FileReader();
+      setFileImage(selectedFile);
 
       reader.onload = () => {
-        const dataUrl = reader.result as string
-        console.log(dataUrl)
-        setPreviewImage(dataUrl)
-      }
+        const dataUrl = reader.result as string;
+        setPreviewImage(dataUrl);
+      };
 
       if (selectedFile) {
-        reader.readAsDataURL(selectedFile)
+        reader.readAsDataURL(selectedFile);
       }
     }
-  }
+  };
 
   return (
     <AdminLayout>
@@ -237,7 +226,7 @@ const ManageUsers = () => {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                {userId ? "Update Account" : "Create New Account"}
+                {userId ? "Cập nhật tài khoản" : "Thêm tài khoản mới"}
               </ModalHeader>
               <ModalBody>
                 <Input label="Name" name="name" value={userSelected?.name} onChange={handleChangeUserSelected} />
@@ -270,7 +259,7 @@ const ManageUsers = () => {
                 {previewImage ? (
                   <Image src={previewImage} alt="Ảnh đại diện" width={200} />
                 ) : (
-                  userSelected?.image && <Image src={userSelected?.image} width={200} />
+                  userSelected?.image && <Image src={`http://localhost:3000/img/users/${userSelected?.image}`} width={200} />
                 )}
                 {userId && (
                   <Checkbox
@@ -291,15 +280,15 @@ const ManageUsers = () => {
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={handleCloseModal}>
-                  Close
+                  Đóng
                 </Button>
                 {userId ? (
                   <CustomButton color="green" onPress={handleUpdateUser}>
-                    Update
+                    Cập nhật
                   </CustomButton>
                 ) : (
                   <CustomButton color="green" onPress={handleCreateUser}>
-                    Create
+                    Tạo
                   </CustomButton>
                 )}
               </ModalFooter>
@@ -309,14 +298,14 @@ const ManageUsers = () => {
       </Modal>
       <div className="px-8 py-4">
         <div className="mb-8 flex items-center gap-4">
-          <Input label="Search by name" size="sm" onChange={handleChangeSearch} />
+          <Input label="Tìm kiếm theo tên" size="sm" onChange={handleChangeSearch} />
           <CustomButton color="green" onClick={onOpen}>
-            Add New
+            Thêm mới
           </CustomButton>
         </div>
         <div>
           <div className="mb-4 flex items-center justify-between">
-            <p className="text-sm text-gray-400">Total: {users?.totalResults} users</p>
+            <p className="text-sm text-gray-400">Tổng: {users?.totalResults} người dùng</p>
             <Pagination showControls total={users?.totalPages ?? 1} page={page} color="success" onChange={setPage} />
           </div>
           <Table aria-label="Example table with custom cells">
@@ -335,7 +324,7 @@ const ManageUsers = () => {
                       {item?.image === "default.jpg" ? (
                         <Avatar size="sm" src={`http://localhost:3000/img/users/${item?.image}`} className="border-2" />
                       ) : (
-                        <Avatar size="sm" src={item?.image} className="border-2" />
+                        <Avatar size="sm" src={`http://localhost:3000/img/users/${item?.image}`} className="border-2" />
                       )}
                       {item.name}
                     </TableCell>
@@ -352,14 +341,14 @@ const ManageUsers = () => {
                     <TableCell>
                       <div className="flex gap-2">
                         <Chip color="success" className="cursor-pointer text-white" onClick={() => handleEdit(item)}>
-                          Edit
+                          Chỉnh sửa
                         </Chip>
                         <Chip
                           color="danger"
                           className="cursor-pointer"
                           onClick={() => handleDeleteUser(item?.id?.toString() ?? "")}
                         >
-                          Delete
+                          Xoá
                         </Chip>
                       </div>
                     </TableCell>
@@ -367,13 +356,13 @@ const ManageUsers = () => {
                 )}
               </TableBody>
             ) : (
-              <TableBody emptyContent={"No rows to display."}>{[]}</TableBody>
+              <TableBody emptyContent={"Hệ thống không có bất kì người dùng nào"}>{[]}</TableBody>
             )}
           </Table>
         </div>
       </div>
     </AdminLayout>
-  )
-}
+  );
+};
 
-export default ManageUsers
+export default ManageUsers;

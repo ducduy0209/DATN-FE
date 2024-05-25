@@ -37,7 +37,7 @@ const HotBooks = () => {
 
   useEffect(() => {
     const handleFetchBook = async () => {
-      const response = await fetch(API_ENDPOINT + `/books?sortBy=access_times:asc`)
+      const response = await fetch(API_ENDPOINT + `/books?sortBy=access_times:desc`)
       const raw = (await response.json()) as Response<any>
       if (raw.data?.result.results) {
         setBooks(raw.data.result.results)

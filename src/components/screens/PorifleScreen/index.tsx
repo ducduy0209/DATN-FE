@@ -49,7 +49,7 @@ const ProfileScreen = ({ type }: Props) => {
         <div className="h-fit basis-1/4 rounded-lg bg-white p-4">
           <div className="flex items-center gap-2 border-b-2 pb-2">
             {accountInfo?.image ? (
-              <Avatar size="sm" src={accountInfo?.image} isBordered color="success" />
+              <Avatar size="sm" src={`http://localhost:3000/img/users/${accountInfo?.image}`} isBordered color="success" />
             ) : (
               <Avatar size="sm" name={accountInfo?.name} isBordered color="success" />
             )}

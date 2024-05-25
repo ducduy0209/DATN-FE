@@ -19,37 +19,37 @@ export const SidebarWrapper = memo(() => {
             <SidebarMenu title="Management">
               <SidebarItem
                 isActive={pathname === "/admin/manage-users"}
-                title="Manage Users"
+                title="Quản lý người dùng"
                 icon={<Icon name="user" />}
                 href="/admin/manage-users"
               />
               <SidebarItem
                 isActive={pathname === "/admin/manage-books"}
-                title="Manage Books"
+                title="Quản lý sách"
                 icon={<Icon name="user" />}
                 href="/admin/manage-books"
               />
               <SidebarItem
                 isActive={pathname === "/admin/manage-genres"}
-                title="Manage Genres"
+                title="Quản lý danh mục"
                 icon={<Icon name="user" />}
                 href="/admin/manage-genres"
               />
               <SidebarItem
                 isActive={pathname === "/admin/manage-records"}
-                title="Manage Records"
+                title="Quản lý đơn đặt hàng"
                 icon={<Icon name="user" />}
                 href="/admin/manage-records"
               />
               <SidebarItem
                 isActive={pathname === "/admin/manage-banners"}
-                title="Manage Banners"
+                title="Quản lý chiến dịch"
                 icon={<Icon name="user" />}
                 href="/admin/manage-banners"
               />
               <SidebarItem
                 isActive={pathname === "/admin/manage-affiliates"}
-                title="Manage Affiliates"
+                title="Quản lý tiếp thị liên kết"
                 icon={<Icon name="user" />}
                 href="/admin/manage-affiliates"
               />

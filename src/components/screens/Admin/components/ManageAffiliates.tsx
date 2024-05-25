@@ -146,11 +146,10 @@ const Affiliates = () => {
       </Modal> */}
       <div className="px-8 py-4">
         <div className="mb-8 flex items-center gap-4">
-          <Input label="Search by name" size="sm" onChange={handleChangeSearch} />
         </div>
         <div>
           <div className="mb-4 flex items-center justify-between">
-            <p className="text-sm text-gray-400">Total: {referrals?.totalResults} Referrals</p>
+            <p className="text-sm text-gray-400">Tổng: {referrals?.totalResults} tiếp thị liên kết</p>
             <Pagination
               showControls
               total={referrals?.totalPages ?? 1}

@@ -328,7 +328,7 @@ const BookScreen = ({ id }: Props) => {
             <div className="ml-2">
               <div>
                 <span className="font-semibold">- Năm xuất bản: </span>
-                <span>{moment(book?.published_date).format("L")}</span>
+                <span>{moment(book?.published_date).locale('vi').format('DD/MM/YYYY')}</span>
               </div>
               <div>
                 <span className="font-semibold">- Mã ISBN: </span>

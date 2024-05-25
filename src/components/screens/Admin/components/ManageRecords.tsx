@@ -64,11 +64,10 @@ type BookSelected = {
 }
 
 const columns: Column[] = [
-  { name: "NAME", uid: "name" },
-  { name: "TITLE", uid: "title" },
-  { name: "DURATION", uid: "duration" },
-  { name: "BORROW DATE", uid: "borrow_date" },
-  { name: "PRICE", uid: "price" },
+  { name: "TÊN SÁCH", uid: "title" },
+  { name: "THỜI HẠN", uid: "duration" },
+  { name: "NGÀY GIAO DỊCH", uid: "borrow_date" },
+  { name: "GIÁ", uid: "price" },
 ]
 
 type CreateRecord = {
@@ -217,7 +216,7 @@ const ManageRecords = () => {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">Create New Record Borrow</ModalHeader>
+              <ModalHeader className="flex flex-col gap-1">Tạo 1 giao dịch mới</ModalHeader>
               <ModalBody>
                 {Object.entries(recordSelected).map((item) => (
                   <>
@@ -317,10 +316,10 @@ const ManageRecords = () => {
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={handleCloseModal}>
-                  Close
+                  Đóng
                 </Button>
                 <CustomButton color="green" onPress={handleCreateRecord}>
-                  Create
+                  Tạo
                 </CustomButton>
               </ModalFooter>
             </>
@@ -329,14 +328,14 @@ const ManageRecords = () => {
       </Modal>
       <div className="px-8 py-4">
         <div className="mb-8 flex items-center gap-4">
-          <Input label="Search by name" size="sm" onChange={handleChangeSearch} />
+          <Input/>
           <CustomButton color="green" onClick={onOpen}>
-            Add New
+            Thêm mới
           </CustomButton>
         </div>
         <div>
           <div className="mb-4 flex items-center justify-between">
-            <p className="text-sm text-gray-400">Total: {records?.totalResults} records</p>
+            <p className="text-sm text-gray-400">Tổng: {records?.totalResults} đã mượn/bán</p>
             <Pagination showControls total={records?.totalPages ?? 1} page={page} color="success" onChange={setPage} />
           </div>
           <Table aria-label="Example table with custom cells">
@@ -351,23 +350,11 @@ const ManageRecords = () => {
               <TableBody items={records.results}>
                 {(item) => (
                   <TableRow key={item.id}>
-                    <TableCell className="flex items-center gap-2">
-                      {item?.userId?.image === "default.jpg" ? (
-                        <Avatar
-                          size="sm"
-                          src={`http://localhost:3000/img/users/${item?.userId?.image}`}
-                          className="border-2"
-                        />
-                      ) : (
-                        <Avatar size="sm" src={item?.userId?.image} className="border-2" />
-                      )}
-                      {item?.userId?.name}
-                    </TableCell>
                     <TableCell>
                       <Chip>{item.book_id?.title}</Chip>
                     </TableCell>
-                    <TableCell>{item.duration}</TableCell>
-                    <TableCell>{moment(item.borrow_date).format("LL")}</TableCell>
+                    <TableCell>{item.duration === 'forever' ? "Vĩnh viễn" : item.duration.replaceAll(/\bmonths?\b/gi, "tháng")}</TableCell>
+                    <TableCell>{moment(item.borrow_date).locale('vi').format('DD/MM/YYYY')}</TableCell>
                     <TableCell>${item.price}</TableCell>
                   </TableRow>
                 )}

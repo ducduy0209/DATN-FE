@@ -60,10 +60,10 @@ type BookSelected = {
 }
 
 const columns: Column[] = [
-  { name: "NAME", uid: "name" },
-  { name: "PRIORITY", uid: "priority" },
-  { name: "SLUG", uid: "slug" },
-  { name: "ACTION", uid: "action" },
+  { name: "TÊN DANH MỤC", uid: "name" },
+  { name: "THỨ TỰ ƯU TIÊN", uid: "priority" },
+  { name: "ĐƯỜNG DẪN", uid: "slug" },
+  { name: "HÀNH ĐỘNG", uid: "action" },
 ]
 
 const ManageGenres = () => {
@@ -198,7 +198,7 @@ const ManageGenres = () => {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">{genreId ? "Update Genre" : "Create New Genre"}</ModalHeader>
+              <ModalHeader className="flex flex-col gap-1">{genreId ? "Cập nhật danh mục" : "Tạo danh mục mới"}</ModalHeader>
               <ModalBody>
                 <Input label="Name" value={genreSelected.name} name="name" onChange={handleChangeItemSelected} />
                 <Input
@@ -210,15 +210,15 @@ const ManageGenres = () => {
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={handleCloseModal}>
-                  Close
+                  Đóng
                 </Button>
                 {genreId ? (
                   <CustomButton color="green" onPress={handleUpdateGenre}>
-                    Update
+                    Cập nhật
                   </CustomButton>
                 ) : (
                   <CustomButton color="green" onPress={handleCreateGenre}>
-                    Create
+                    Tạo
                   </CustomButton>
                 )}
               </ModalFooter>
@@ -230,12 +230,12 @@ const ManageGenres = () => {
         <div className="mb-8 flex items-center gap-4">
           <Input label="Search by name" size="sm" onChange={handleChangeSearch} />
           <CustomButton color="green" onClick={onOpen}>
-            Add New
+            Thêm mới
           </CustomButton>
         </div>
         <div>
           <div className="mb-4 flex items-center justify-between">
-            <p className="text-sm text-gray-400">Total: {genres?.totalResults} genres</p>
+            <p className="text-sm text-gray-400">Tổng: {genres?.totalResults} danh mục</p>
             <Pagination showControls total={genres?.totalPages ?? 1} page={page} color="success" onChange={setPage} />
           </div>
           <Table aria-label="Example table with custom cells">
@@ -262,10 +262,10 @@ const ManageGenres = () => {
                     <TableCell>
                       <div className="flex gap-2">
                         <Chip color="success" className="cursor-pointer text-white" onClick={() => handleEdit(item)}>
-                          Edit
+                          Chỉnh sửa
                         </Chip>
                         <Chip color="danger" className="cursor-pointer" onClick={() => handleDeleteGenre(item.id)}>
-                          Delete
+                          Xoá
                         </Chip>
                       </div>
                     </TableCell>
@@ -273,7 +273,7 @@ const ManageGenres = () => {
                 )}
               </TableBody>
             ) : (
-              <TableBody emptyContent={"No rows to display."}>{[]}</TableBody>
+              <TableBody emptyContent={"Không có danh mục nào."}>{[]}</TableBody>
             )}
           </Table>
         </div>

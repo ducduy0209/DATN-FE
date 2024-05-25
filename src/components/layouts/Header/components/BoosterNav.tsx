@@ -50,10 +50,10 @@ const BoosterNav = () => {
       </Link>
       <div className="relative" ref={toggleRef} onMouseDown={handleMouseDown}>
         <div className="bg-green flex cursor-pointer items-center gap-2 rounded-xl border px-4 py-1 text-sm font-semibold text-black transition-all delay-75 hover:border-white hover:bg-green-400 hover:text-white">
-          {accountInfo?.image === "default.jpg" ? (
+          {accountInfo?.image? (
             <Avatar size="sm" src={`http://localhost:3000/img/users/${accountInfo?.image}`} className="border-2" />
           ) : (
-            <Avatar size="sm" src={accountInfo?.image} className="border-2" />
+            <Avatar size="sm" name={accountInfo?.name} isBordered color="success" />
           )}
           {accountInfo?.name?.slice(0, 7)}...
         </div>

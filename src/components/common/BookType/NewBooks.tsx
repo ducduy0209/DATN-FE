@@ -37,7 +37,7 @@ const NewBooks = () => {
 
   useEffect(() => {
     const handleFetchBook = async () => {
-      const response = await fetch(API_ENDPOINT + `/books?sortBy=published_date:asc`)
+      const response = await fetch(API_ENDPOINT + `/books?sortBy=published_date:desc`)
       const raw = (await response.json()) as Response<any>
       if (raw.data?.result.results) {
         setBooks(raw.data.result.results)
