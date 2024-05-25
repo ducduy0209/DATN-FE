@@ -37,6 +37,7 @@ import { useBoundStore } from "@zustand/total"
 import { NOTIFICATION_TYPE, notify } from "@utils/notify"
 import { Category } from "@models/category"
 import { Borrow } from "@models/borrow"
+import { User } from "@models/user"
 
 type Column = {
   name: string
@@ -155,6 +156,54 @@ const ManageRecords = () => {
     }
   }
 
+  const [users, setUsers] = useState<DataWithPagination<User[]>>()
+  const [pageUser, setPageUser] = useState<number>(1)
+  const [searchUser, setSearchUser] = useState<string>("")
+
+  useEffect(() => {
+    const handleFetchUsers = async () => {
+      let params = `/users?page=${pageUser}&limit=${limit}`
+      if (searchUser) {
+        params += `&name=${searchUser}`
+      }
+      const response = await fetch(API_ENDPOINT + params, {
+        headers: {
+          authorization: `Bearer ${authInfo?.access?.token}`,
+        },
+      })
+      const raw = (await response.json()) as Response<any>
+      if (raw.status === "success") {
+        setUsers(raw.data.result as DataWithPagination<User[]>)
+      }
+    }
+    handleFetchUsers()
+  }, [pageUser, searchUser, isStaleData])
+
+  const [books, setBooks] = useState<DataWithPagination<Book[]>>()
+  const [pageBook, setPageBook] = useState<number>(1)
+  const [searchBook, setSearchBook] = useState<string>("")
+
+  useEffect(() => {
+    const handleFetchBooks = async () => {
+      let params = `/books?page=${pageBook}&limit=${limit}`
+      if (searchBook) {
+        params += `&search=${searchBook}`
+      }
+      const response = await fetch(API_ENDPOINT + params)
+      const raw = (await response.json()) as Response<any>
+      if (raw.status === "success") {
+        const newBooks = {
+          results: raw.data.result.results,
+          page: Number(raw.data.result.page),
+          totalPages: Number(raw.data.result.totalPages),
+          totalResults: Number(raw.data.result.totalResults),
+        }
+        setBooks(newBooks as DataWithPagination<Book[]>)
+      }
+    }
+    handleFetchBooks()
+  }, [pageBook, searchBook, isStaleData])
+
   return (
     <AdminLayout>
       <Modal
@@ -198,6 +247,62 @@ const ManageRecords = () => {
                         >
                           Vĩnh viễn
                         </Checkbox>
+                      </div>
+                    ) : item[0] === "user_id" ? (
+                      <div className="flex flex-col gap-2 bg-green-100 p-4">
+                        <p className="text-sm">Select User</p>
+                        <Input
+                          label="Search user"
+                          size="sm"
+                          value={searchUser}
+                          onChange={(e) => setSearchUser(e.target.value)}
+                        />
+                        <div className="flex gap-4 rounded-lg bg-slate-100 px-4 py-2">
+                          {users?.results.length &&
+                            users.results.map((user) => (
+                              <div
+                                className={`rounded-lg px-2 py-1 ${recordSelected.user_id === user.id ? "bg-green-400" : "bg-white"} cursor-pointer`}
+                                onClick={() => setRecordSelected({ ...recordSelected, user_id: user.id ?? "" })}
+                              >
+                                {user.name}
+                              </div>
+                            ))}
+                        </div>
+                        <Pagination
+                          showControls
+                          total={users?.totalPages ?? 1}
+                          page={pageUser}
+                          color="success"
+                          onChange={(pageSelect) => setPageUser(pageSelect)}
+                        />
+                      </div>
+                    ) : item[0] === "book_id" ? (
+                      <div className="flex flex-col gap-2 bg-green-100 p-4">
+                        <p className="text-sm">Select Book</p>
+                        <Input
+                          label="Search book"
+                          size="sm"
+                          value={searchBook}
+                          onChange={(e) => setSearchBook(e.target.value)}
+                        />
+                        <div className="flex gap-4 rounded-lg bg-slate-100 px-4 py-2">
+                          {books?.results.length &&
+                            books.results.map((book) => (
+                              <div
+                                className={`rounded-lg px-2 py-1 ${recordSelected.book_id === book.id ? "bg-green-400" : "bg-white"} cursor-pointer`}
+                                onClick={() => setRecordSelected({ ...recordSelected, book_id: book.id ?? "" })}
+                              >
+                                {book.title}
+                              </div>
+                            ))}
+                        </div>
+                        <Pagination
+                          showControls
+                          total={books?.totalPages ?? 1}
+                          page={pageBook}
+                          color="success"
+                          onChange={(pageSelect) => setPageBook(pageSelect)}
+                        />
                       </div>
                     ) : (
                       <Input

@@ -165,7 +165,7 @@ const ManageUsers = () => {
   }
 
   useEffect(() => {
-    const handleFetchBook = async () => {
+    const handleFetchUsers = async () => {
       let params = `/users?page=${page}&limit=${limit}`
       if (search) {
         params += `&name=${search}`
@@ -181,7 +181,7 @@ const ManageUsers = () => {
         setBooks(raw.data.result as DataWithPagination<User[]>)
       }
     }
-    handleFetchBook()
+    handleFetchUsers()
   }, [page, search, isStaleData])
 
   const handleEdit = (user: User) => {
