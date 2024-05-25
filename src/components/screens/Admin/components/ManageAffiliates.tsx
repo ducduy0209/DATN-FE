@@ -67,7 +67,9 @@ const Affiliates = () => {
 
   useEffect(() => {
     const handleFetchReferrals = async () => {
-      const response = await fetch(API_ENDPOINT + `/affiliates?name=${search}`, {
+      let endPoint = '/affiliates'
+      if(search) endPoint = endPoint.substring(0, endPoint.length - 1) + `?name=${search}`
+      const response = await fetch(API_ENDPOINT + endPoint, {
         headers: { "Content-Type": "application/json", authorization: `Bearer ${authInfo.access?.token}` },
       })
       const data = (await response.json()) as Response<any>

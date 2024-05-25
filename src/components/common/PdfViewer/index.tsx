@@ -24,7 +24,7 @@ const PdfViewer = ({ bookId, title, isOpen, onOpen, onOpenChange }: Props) => {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">Preview book: {title}</ModalHeader>
+              <ModalHeader className="flex flex-col gap-1">Xem trước sách: {title}</ModalHeader>
               <ModalBody>
                 <div className="absolute left-[50%] top-[50%] -z-10">{isLoading && <Spinner />}</div>
                 <iframe

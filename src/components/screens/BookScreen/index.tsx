@@ -205,6 +205,21 @@ const BookScreen = ({ id }: Props) => {
     handleIncreaseView()
   }, [book])
 
+  useEffect(() => {
+    const refer_code = searchParams.get("refer_code")
+    if (refer_code) {
+      const handleReferCodeClick = async () => {
+        await fetch(`${API_ENDPOINT}/affiliates/${refer_code}/click`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+      }
+      handleReferCodeClick()
+    }
+  }, [searchParams])
+
   return (
     <div className="px-40 py-4">
       {book?.id && (
@@ -222,7 +237,7 @@ const BookScreen = ({ id }: Props) => {
         <div className="flex flex-col items-center gap-12">
           <Image src={`http://localhost:3000/img/books/${selectImage}`} width={200} className="rounded-none" />
           <CustomButton color="default" onClick={onOpen}>
-            Preview
+            Xem trước
           </CustomButton>
         </div>
         <div className="w-[80%]">
