@@ -231,7 +231,7 @@ const ManageRecords = () => {
         </div>
         <div>
           <div className="mb-4 flex items-center justify-between">
-            <p className="text-sm text-gray-400">Total: {records?.totalResults} genres</p>
+            <p className="text-sm text-gray-400">Total: {records?.totalResults} records</p>
             <Pagination showControls total={records?.totalPages ?? 1} page={page} color="success" onChange={setPage} />
           </div>
           <Table aria-label="Example table with custom cells">

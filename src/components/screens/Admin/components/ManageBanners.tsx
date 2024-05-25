@@ -156,7 +156,7 @@ const ManageBanners = () => {
 
   useEffect(() => {
     const handleFetchBanners = async () => {
-      let params = `/banners?isActive=${isActive}&page=${page}&limit=${limit}`
+      let params = `/banners?page=${page}&limit=${limit}`
       if (search) {
         params += `&name=${search}`
       }
