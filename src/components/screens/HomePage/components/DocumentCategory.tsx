@@ -82,7 +82,7 @@ const DocumentCategory = () => {
 
   useEffect(() => {
     const handleFetchBanners = async () => {
-      const response = await fetch(API_ENDPOINT + "/banners?name=Banner&isActive=true", {
+      const response = await fetch(API_ENDPOINT + "/banners?isActive=true", {
         headers: { "Content-Type": "application/json" },
       })
       const raw = (await response.json()) as Response<any>

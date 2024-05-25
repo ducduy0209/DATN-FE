@@ -9,10 +9,10 @@ import { Response } from "@models/api"
 import { useRouter } from "next/router"
 import { Banner } from "./DocumentCategory"
 
-const IMAGES = [
-  "https://static01.nyt.com/images/2021/04/04/pageoneplus/bookreview_itt_lede/bookreview_itt_lede-superJumbo.jpg",
-  "https://media.npr.org/assets/img/2021/02/05/gettyimages-1250276752-832bdef38dd1834d8190b0dafba4049084cd7edf.jpg",
-]
+// const IMAGES = [
+//   "https://static01.nyt.com/images/2021/04/04/pageoneplus/bookreview_itt_lede/bookreview_itt_lede-superJumbo.jpg",
+//   "https://media.npr.org/assets/img/2021/02/05/gettyimages-1250276752-832bdef38dd1834d8190b0dafba4049084cd7edf.jpg",
+// ]
 
 type Props = {
   banners?: Banner[]
@@ -38,7 +38,6 @@ export function BookGrid({ banners }: Props) {
       <div className="mb-4 flex w-full">
         <div className="relative mr-4 h-[420px] w-[540px] px-4">
           <Slider {...SETTINGS} className="z-1 h-full w-[500px]">
-            <Image src={IMAGES[0]} alt="image" className="h-[420px]" />
             {banners?.length &&
               banners.map((image) => (
                 <Image

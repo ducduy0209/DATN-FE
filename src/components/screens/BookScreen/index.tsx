@@ -116,7 +116,7 @@ const BookScreen = ({ id }: Props) => {
         route.push("/cart")
       }
     } else {
-      notify(NOTIFICATION_TYPE.ERROR, "Có lỗi xảy ra, vui lòng thử lại!")
+      notify(NOTIFICATION_TYPE.ERROR, raw?.message ? raw?.message : "Có lỗi xảy ra, vui này thử được!")
     }
   }
 
