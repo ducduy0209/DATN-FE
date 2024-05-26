@@ -16,7 +16,7 @@ export const SidebarWrapper = memo(() => {
         <div className="flex h-full flex-col justify-between">
           <div className={Sidebar.Body()}>
             <SidebarItem title="Trang chủ" icon={<Icon name="home" />} isActive={pathname === "/admin"} href="/admin" />
-            <SidebarMenu title="Management">
+            <SidebarMenu title="Quản lý">
               <SidebarItem
                 isActive={pathname === "/admin/manage-users"}
                 title="Quản lý người dùng"
@@ -26,36 +26,42 @@ export const SidebarWrapper = memo(() => {
               <SidebarItem
                 isActive={pathname === "/admin/manage-books"}
                 title="Quản lý sách"
-                icon={<Icon name="user" />}
+                icon={<Icon name="book" />}
                 href="/admin/manage-books"
               />
               <SidebarItem
                 isActive={pathname === "/admin/manage-genres"}
                 title="Quản lý danh mục"
-                icon={<Icon name="user" />}
+                icon={<Icon name="tag" />}
                 href="/admin/manage-genres"
               />
               <SidebarItem
                 isActive={pathname === "/admin/manage-records"}
                 title="Quản lý đơn đặt hàng"
-                icon={<Icon name="user" />}
+                icon={<Icon name="shopping-cart" />}
                 href="/admin/manage-records"
               />
               <SidebarItem
                 isActive={pathname === "/admin/manage-banners"}
                 title="Quản lý chiến dịch"
-                icon={<Icon name="user" />}
+                icon={<Icon name="megaphone" />}
                 href="/admin/manage-banners"
               />
               <SidebarItem
                 isActive={pathname === "/admin/manage-affiliates"}
                 title="Quản lý tiếp thị liên kết"
-                icon={<Icon name="user" />}
+                icon={<Icon name="link" />}
                 href="/admin/manage-affiliates"
+              />
+              <SidebarItem
+                isActive={pathname === "/admin/manage-coupons"}
+                title="Quản lý mã giảm giá"
+                icon={<Icon name="ticket" />}
+                href="/admin/manage-coupons"
               />
             </SidebarMenu>
             <SidebarMenu title="Thống kê">
-              <SidebarItem
+            <SidebarItem
                 isActive={pathname === "/admin/top-seller-books"}
                 title="Top 10 sách bán chạy"
                 icon={<Icon name="book" />}
@@ -69,21 +75,7 @@ export const SidebarWrapper = memo(() => {
               />
             </SidebarMenu>
           </div>
-          <div className={Sidebar.Footer()}>
-            <Tooltip content={"Settings"} color="primary">
-              <div className="max-w-fit">
-                <Icon name="settings" />
-              </div>
-            </Tooltip>
-            <Tooltip content={"Adjustments"} color="primary">
-              <div className="max-w-fit">
-                <Icon name="filter" />
-              </div>
-            </Tooltip>
-            <Tooltip content={"Profile"} color="primary">
-              <Avatar src="https://i.pravatar.cc/150?u=a042581f4e29026704d" size="sm" />
-            </Tooltip>
-          </div>
+          
         </div>
       </div>
     </aside>

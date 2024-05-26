@@ -8,6 +8,7 @@ export const CustomButton = extendVariants(Button, {
       orange: "bg-[#ff8c00] text-[#fff]",
       violet: "bg-[#8b5cf6] text-[#fff]",
       green: "text-white bg-green-400",
+      white: "text-black bg-white", // Thêm màu trắng
     },
     isDisabled: {
       true: "opacity-50 cursor-not-allowed",
@@ -22,8 +23,7 @@ export const CustomButton = extendVariants(Button, {
     },
   },
   defaultVariants: {
-    // <- modify/add default variants
     color: "green",
     size: "md",
   },
-})
+});

@@ -1,10 +1,7 @@
 import { Avatar } from "@nextui-org/react"
-import Link from "next/link"
-import React, { ChangeEvent, useState } from "react"
-import colors from "tailwindcss/colors"
+import React from "react"
 import { useBoundStore } from "@zustand/total"
 import { useRouter } from "next/router"
-import { ROLE_ACCOUNT } from "@models/user"
 import { CustomButton } from "@components/common/CustomButton"
 
 const DropDownMenu = () => {
@@ -14,12 +11,16 @@ const DropDownMenu = () => {
     removeAuthInfo: store.removeAuthInfo,
   }))
 
-  const route = useRouter()
+  const router = useRouter()
 
   const onLogout = () => {
     removeAccountInfo()
     removeAuthInfo()
-    route.push("/")
+    router.push("/")
+  }
+
+  const handleNavigation = (path: string) => {
+    router.push(path)
   }
 
   return (
@@ -27,7 +28,7 @@ const DropDownMenu = () => {
       <div className="p-8 text-center">
         <div className="flex flex-col items-center gap-1 text-center text-sm font-normal text-gray-400">
           {accountInfo?.image ? (
-            <Avatar size="sm" src={`  http://localhost:3000/img/users/${accountInfo?.image}`} name={accountInfo?.name} isBordered color="success" />
+            <Avatar size="sm" src={`http://localhost:3000/img/users/${accountInfo?.image}`} name={accountInfo?.name} isBordered color="success" />
           ) : (
             <Avatar size="sm" name={accountInfo?.name} isBordered color="success" />
           )}
@@ -36,38 +37,51 @@ const DropDownMenu = () => {
       </div>
       <div className="flex flex-col gap-4 border-t border-gray-300 p-4">
         <div>
-          <Link
-            className="hover cursor-pointer rounded-md border-b-1 px-4 py-2 hover:bg-white hover:text-black"
-            href={"/profile/purchased-books"}
+          <CustomButton
+            className="w-full text-left rounded-md px-4 py-2"
+            onClick={() => handleNavigation("/profile/purchased-books")}
+            color="white"
           >
-            <p>Sách đã mua</p>
-          </Link>
-          <Link
-            href={"/profile/my-account"}
-            className="hover mb-2 cursor-pointer rounded-md border-b-1 px-4 py-2 hover:bg-white hover:text-black"
+            Sách đã mua
+          </CustomButton>
+          <CustomButton
+            className="w-full text-left rounded-md px-4 py-2"
+            onClick={() => handleNavigation("/profile/my-account")}
+            color="white"
           >
-            <p>Thông tin tài khoản</p>
-          </Link>
-          <Link
-            href={"/profile/change-password"}
-            className="hover mb-2 cursor-pointer rounded-md border-b-1 px-4 py-2 hover:bg-white hover:text-black"
+            Thông tin tài khoản
+          </CustomButton>
+          <CustomButton
+            className="w-full text-left rounded-md px-4 py-2"
+            onClick={() => handleNavigation("/profile/change-password")}
+            color="white"
           >
-            <p>Đổi mật khẩu</p>
-          </Link>
-          <Link
-            href={"/profile/purchase-history"}
-            className="hover mb-2 cursor-pointer rounded-md border-b-1 px-4 py-2 hover:bg-white hover:text-black"
+            Đổi mật khẩu
+          </CustomButton>
+          <CustomButton
+            className="w-full text-left rounded-md px-4 py-2"
+            onClick={() => handleNavigation("/profile/purchase-history")}
+            color="white"
           >
-            <p>Lịch sự mua hàng</p>
-          </Link>
-          <Link
-            href={"/profile/referral"}
-            className="hover mb-2 cursor-pointer rounded-md border-b-1 px-4 py-2 hover:bg-white hover:text-black"
+            Lịch sử mua hàng
+          </CustomButton>
+          <CustomButton
+            className="w-full text-left rounded-md px-4 py-2"
+            onClick={() => handleNavigation("/profile/referral")}
+            color="white"
           >
-            <div>Tiếp thị liên kết</div>
-          </Link>
+            Tiếp thị liên kết
+          </CustomButton>
+          {accountInfo?.role === 'admin' && (
+            <CustomButton
+              className="w-full text-left rounded-md px-4 py-2"
+              onClick={() => handleNavigation("/admin")}
+              color="white"
+            >
+              Quản trị
+            </CustomButton>
+          )}
         </div>
-
         <br />
         <CustomButton onClick={onLogout} color="green">
           Đăng xuất

@@ -81,7 +81,7 @@ const Referral = () => {
       console.log(data)
       if (data?.data?.results) {
         setReferrals(data.data)
-        setEmail(data.data.results[0].email_receiver)
+        setEmail(data.data.results[0]?.email_receiver || "")
       }
     }
     handleFetchReferrals()
