@@ -179,7 +179,7 @@ const Affiliates = () => {
                 )}
               </TableBody>
             ) : (
-              <TableBody emptyContent={"No rows to display."}>{[]}</TableBody>
+              <TableBody emptyContent={"Không có dữ liệu của tiếp thị liên kết nào!"}>{[]}</TableBody>
             )}
           </Table>
         </div>

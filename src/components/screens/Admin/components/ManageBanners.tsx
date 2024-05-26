@@ -62,13 +62,10 @@ const ManageBanners = () => {
   const [limit, setLimit] = useState<number>(5);
   const [isStaleData, setIsStaleData] = useState<boolean>(false);
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
-  const {
-    isOpen: isOpenImage,
-    onOpen: onOpenImage,
-    onOpenChange: opnOpenChangeImage,
-    onClose: onCloseImage,
-  } = useDisclosure();
+  const { isOpen: isOpenImage, onOpen: onOpenImage, onOpenChange: onOpenChangeImage, onClose: onCloseImage } = useDisclosure();
+  const { isOpen: isDeleteModalOpen, onOpen: onDeleteModalOpen, onOpenChange: onDeleteModalOpenChange, onClose: onDeleteModalClose } = useDisclosure();
   const [bannerId, setBannerId] = useState<string>("");
+  const [bannerToDelete, setBannerToDelete] = useState<string>("");
   const [bannerSelected, setBannerSelected] = useState<Banner>({
     isActive: true,
     due_date: "",
@@ -88,8 +85,8 @@ const ManageBanners = () => {
     setPage(1);
   };
 
-  const handleDeleteBanner = async (bannerId: string) => {
-    const response = await fetch(API_ENDPOINT + `/banners/${bannerId}`, {
+  const handleDeleteBanner = async () => {
+    const response = await fetch(API_ENDPOINT + `/banners/${bannerToDelete}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -103,6 +100,7 @@ const ManageBanners = () => {
       const raw = (await response.json()) as Response<any>;
       notify(NOTIFICATION_TYPE.ERROR, raw?.message ? raw.message : "Có lỗi xảy ra, vui lòng thử lại");
     }
+    onDeleteModalClose();
   };
 
   const handleUpdateBanner = async () => {
@@ -235,6 +233,11 @@ const ManageBanners = () => {
     onOpenImage();
   };
 
+  const handleOpenDeleteModal = (id: string) => {
+    setBannerToDelete(id);
+    onDeleteModalOpen();
+  };
+
   return (
     <AdminLayout>
       <Modal
@@ -292,7 +295,7 @@ const ManageBanners = () => {
       <Modal
         isOpen={isOpenImage}
         onClose={onCloseImage}
-        onOpenChange={opnOpenChangeImage}
+        onOpenChange={onOpenChangeImage}
         scrollBehavior="inside"
         placement="center"
         size="5xl"
@@ -312,6 +315,33 @@ const ManageBanners = () => {
                 <Button color="danger" variant="light" onPress={onCloseImage}>
                   Close
                 </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={onDeleteModalClose}
+        onOpenChange={onDeleteModalOpenChange}
+        scrollBehavior="inside"
+        placement="center"
+        size="sm"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">Xác nhận</ModalHeader>
+              <ModalBody>
+                <p>Bạn có chắc chắn muốn xóa chiến dịch này không?</p>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onDeleteModalClose}>
+                  Hủy
+                </Button>
+                <CustomButton color="green" onPress={handleDeleteBanner}>
+                  Xóa
+                </CustomButton>
               </ModalFooter>
             </>
           )}
@@ -339,7 +369,7 @@ const ManageBanners = () => {
             </TableHeader>
             {banners?.results.length ? (
               <TableBody items={banners.results}>
-                {(item) => (
+                {(item: Banner) => (
                   <TableRow key={item.id}>
                     <TableCell>{item.name}</TableCell>
                     <TableCell>
@@ -354,7 +384,7 @@ const ManageBanners = () => {
                         <Chip color="success" className="cursor-pointer text-white" onClick={() => handleEdit(item)}>
                           Chỉnh sửa
                         </Chip>
-                        <Chip color="danger" className="cursor-pointer" onClick={() => handleDeleteBanner(item.id)}>
+                        <Chip color="danger" className="cursor-pointer" onClick={() => handleOpenDeleteModal(item.id)}>
                           Xoá
                         </Chip>
                       </div>
@@ -363,7 +393,7 @@ const ManageBanners = () => {
                 )}
               </TableBody>
             ) : (
-              <TableBody emptyContent={"No rows to display."}>{[]}</TableBody>
+              <TableBody emptyContent={"Không có dữ liệu của chiến dịch nào!"}>{[]}</TableBody>
             )}
           </Table>
         </div>

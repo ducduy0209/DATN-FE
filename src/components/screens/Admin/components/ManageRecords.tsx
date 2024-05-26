@@ -360,7 +360,7 @@ const ManageRecords = () => {
                 )}
               </TableBody>
             ) : (
-              <TableBody emptyContent={"No rows to display."}>{[]}</TableBody>
+              <TableBody emptyContent={"Không có dữ liệu của giao dịch nào!"}>{[]}</TableBody>
             )}
           </Table>
         </div>

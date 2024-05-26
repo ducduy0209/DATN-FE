@@ -138,7 +138,7 @@ const ManageBooks = () => {
         summary: newBookSelected.summary,
         cover_image: newBookSelected.cover_image,
         total_book_pages: newBookSelected.total_book_pages,
-        digital_content: newBookSelected.digital_content,
+        digital_content: newBookSelected.digital_content + "",
         prices: [{ duration: '', price: 0 }],
         languange: newBookSelected.languange,
         price: newBookSelected.price,
@@ -277,7 +277,7 @@ const ManageBooks = () => {
       summary: book.summary,
       cover_image: book.cover_image,
       total_book_pages: book.total_book_pages,
-      digital_content: book.digital_content,
+      digital_content: book.digital_content + "",
       prices: book.prices,
       languange: book.languange,
       price: book.price,
@@ -556,7 +556,7 @@ const ManageBooks = () => {
                 )}
               </TableBody>
             ) : (
-              <TableBody emptyContent={'No rows to display.'}>{[]}</TableBody>
+              <TableBody emptyContent={'Không có dữ liệu của sách nào!'}>{[]}</TableBody>
             )}
           </Table>
         </div>

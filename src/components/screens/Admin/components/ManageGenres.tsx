@@ -73,6 +73,7 @@ const ManageGenres = () => {
   const [limit, setLimit] = useState<number>(5)
   const [isStaleData, setIsStaleData] = useState<boolean>(false)
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure()
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false)
   const [genreSelected, setGenreSelected] = useState<Category>({
     priority: 0,
     name: "",
@@ -80,6 +81,7 @@ const ManageGenres = () => {
     id: "",
   })
   const [genreId, setGenreId] = useState<string>("")
+  const [genreToDelete, setGenreToDelete] = useState<string>("")
 
   const { authInfo } = useBoundStore((state) => ({
     authInfo: state.authInfo,
@@ -90,8 +92,8 @@ const ManageGenres = () => {
     // setPage(1)
   }
 
-  const handleDeleteGenre = async (genreId: string) => {
-    const response = await fetch(API_ENDPOINT + `/genres/${genreId}`, {
+  const handleDeleteGenre = async () => {
+    const response = await fetch(API_ENDPOINT + `/genres/${genreToDelete}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -99,11 +101,12 @@ const ManageGenres = () => {
       },
     })
     if (response.status === 200) {
-      notify(NOTIFICATION_TYPE.SUCCESS, "Chủ đề đã được xoá thành công")
+      notify(NOTIFICATION_TYPE.SUCCESS, "Danh mục đã được xoá thành công")
       setIsStaleData(!isStaleData)
     } else {
       notify(NOTIFICATION_TYPE.ERROR, "Có lỗi xảy ra, vui lòng thử lại")
     }
+    setDeleteModalOpen(false)
   }
 
   const handleUpdateGenre = async () => {
@@ -141,7 +144,7 @@ const ManageGenres = () => {
       }),
     })
     if (response.status === 201) {
-      notify(NOTIFICATION_TYPE.SUCCESS, "Tạo mới chủ đề thành công")
+      notify(NOTIFICATION_TYPE.SUCCESS, "Tạo mới Danh mục thành công")
       handleCloseModal()
       setIsStaleData(!isStaleData)
     } else {
@@ -171,6 +174,11 @@ const ManageGenres = () => {
     onOpen()
   }
 
+  const handleOpenDeleteModal = (genreId: string) => {
+    setGenreToDelete(genreId)
+    setDeleteModalOpen(true)
+  }
+
   const handleChangeItemSelected = (e: ChangeEvent<HTMLInputElement>) => {
     const name = e.target.name
     const value = e.target.value
@@ -183,6 +191,11 @@ const ManageGenres = () => {
   const handleCloseModal = () => {
     setGenreId("")
     onClose()
+  }
+
+  const handleCloseDeleteModal = () => {
+    setGenreToDelete("")
+    setDeleteModalOpen(false)
   }
 
   return (
@@ -226,6 +239,35 @@ const ManageGenres = () => {
           )}
         </ModalContent>
       </Modal>
+
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        onOpenChange={setDeleteModalOpen}
+        scrollBehavior="inside"
+        placement="center"
+        size="sm"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">Xác nhận xoá</ModalHeader>
+              <ModalBody>
+                <p>Bạn có chắc chắn muốn xoá Danh mục này không?</p>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={handleCloseDeleteModal}>
+                  Huỷ
+                </Button>
+                <CustomButton color="danger" onPress={handleDeleteGenre}>
+                  Xoá
+                </CustomButton>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
       <div className="px-8 py-4">
         <div className="mb-8 flex items-center gap-4">
           <Input label="Tìm kiếm theo tên" size="sm" onChange={handleChangeSearch} />
@@ -264,7 +306,7 @@ const ManageGenres = () => {
                         <Chip color="success" className="cursor-pointer text-white" onClick={() => handleEdit(item)}>
                           Chỉnh sửa
                         </Chip>
-                        <Chip color="danger" className="cursor-pointer" onClick={() => handleDeleteGenre(item.id)}>
+                        <Chip color="danger" className="cursor-pointer" onClick={() => handleOpenDeleteModal(item.id)}>
                           Xoá
                         </Chip>
                       </div>
@@ -273,7 +315,7 @@ const ManageGenres = () => {
                 )}
               </TableBody>
             ) : (
-              <TableBody emptyContent={"Không có danh mục nào."}>{[]}</TableBody>
+              <TableBody emptyContent={"Không có dữ liệu danh mục nào."}>{[]}</TableBody>
             )}
           </Table>
         </div>

@@ -54,6 +54,7 @@ const ManageCoupons = () => {
   const [limit, setLimit] = useState<number>(5)
   const [isStaleData, setIsStaleData] = useState<boolean>(false)
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure()
+  const { isOpen: isDeleteModalOpen, onOpen: onDeleteModalOpen, onOpenChange: onDeleteModalOpenChange, onClose: onDeleteModalClose } = useDisclosure()
   const emptyCoupon: Coupon = {
     id: "",
     code: "",
@@ -69,6 +70,7 @@ const ManageCoupons = () => {
   }
   const [couponSelected, setCouponSelected] = useState<Coupon>(emptyCoupon)
   const [couponId, setCouponId] = useState<string>("")
+  const [couponToDelete, setCouponToDelete] = useState<string>("")
 
   const { authInfo } = useBoundStore((state) => ({
     authInfo: state.authInfo,
@@ -79,8 +81,8 @@ const ManageCoupons = () => {
     setPage(1)
   }
 
-  const handleDeleteCoupon = async (couponId: string) => {
-    const response = await fetch(API_ENDPOINT + `/coupons/${couponId}`, {
+  const handleDeleteCoupon = async () => {
+    const response = await fetch(API_ENDPOINT + `/coupons/${couponToDelete}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -93,6 +95,7 @@ const ManageCoupons = () => {
     } else {
       notify(NOTIFICATION_TYPE.ERROR, "Có lỗi xảy ra, vui lòng thử lại")
     }
+    onDeleteModalClose()
   }
 
   const validateCoupon = (): boolean => {
@@ -208,6 +211,11 @@ const ManageCoupons = () => {
     onOpen()
   }
 
+  const handleOpenDeleteModal = (couponId: string) => {
+    setCouponToDelete(couponId)
+    onDeleteModalOpen()
+  }
+
   const handleOpenModal = () => {
     setCouponSelected(emptyCoupon)
     setCouponId("")
@@ -317,6 +325,33 @@ const ManageCoupons = () => {
           )}
         </ModalContent>
       </Modal>
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={onDeleteModalClose}
+        onOpenChange={onDeleteModalOpenChange}
+        scrollBehavior="inside"
+        placement="center"
+        size="md"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">Xác nhận xoá</ModalHeader>
+              <ModalBody>
+                <p>Bạn có chắc chắn muốn xoá mã giảm giá này không?</p>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onDeleteModalClose}>
+                  Huỷ
+                </Button>
+                <CustomButton color="green" onPress={handleDeleteCoupon}>
+                  Xoá
+                </CustomButton>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
       <div className="px-8 py-4">
         <div className="mb-8 flex items-center gap-4">
           <Input label="Tìm kiếm theo mã giảm giá" size="sm" onChange={handleChangeSearch} />
@@ -358,7 +393,7 @@ const ManageCoupons = () => {
                         <Chip color="success" className="cursor-pointer text-white" onClick={() => handleEdit(item)}>
                           Chỉnh sửa
                         </Chip>
-                        <Chip color="danger" className="cursor-pointer" onClick={() => handleDeleteCoupon(item.id)}>
+                        <Chip color="danger" className="cursor-pointer" onClick={() => handleOpenDeleteModal(item.id)}>
                           Xoá
                         </Chip>
                       </div>
@@ -367,7 +402,7 @@ const ManageCoupons = () => {
                 )}
               </TableBody>
             ) : (
-              <TableBody emptyContent={"Không có coupon nào."}>{[]}</TableBody>
+              <TableBody emptyContent={"Không có dữ liệu mã giảm giá nào!"}>{[]}</TableBody>
             )}
           </Table>
         </div>
