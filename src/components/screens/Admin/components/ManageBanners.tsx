@@ -106,7 +106,7 @@ const ManageBanners = () => {
   const handleUpdateBanner = async () => {
     const data = new FormData();
     data.append("name", bannerSelected.name);
-    data.append("due_date", bannerSelected.due_date);
+    data.append("due_date", bannerSelected.due_date ?? "");
     data.append("isActive", bannerSelected.isActive.toString());
     if (fileImage) {
       data.append("image", fileImage);
@@ -134,7 +134,7 @@ const ManageBanners = () => {
   const handleCreateBanner = async () => {
     const data = new FormData();
     data.append("name", bannerSelected.name);
-    data.append("due_date", bannerSelected.due_date);
+    data.append("due_date", bannerSelected.due_date ?? "");
     data.append("isActive", bannerSelected.isActive.toString());
     if (fileImage) {
       data.append("image", fileImage);
@@ -199,7 +199,7 @@ const ManageBanners = () => {
     setBannerId("");
     setBannerSelected({
       isActive: true,
-      due_date: "",
+      due_date: "null",
       name: "",
       image: "",
       id: "",
