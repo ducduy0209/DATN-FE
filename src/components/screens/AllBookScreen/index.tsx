@@ -4,7 +4,7 @@ import Icon from "@components/icons"
 import React, { ChangeEvent, useEffect, useState } from "react"
 import { Image, Input, Pagination } from "@nextui-org/react"
 import { formatCurrency } from "@utils/formatCurrency"
-import { API_ENDPOINT, DataWithPagination, SORT_TYPE } from "@models/api"
+import { API_ENDPOINT, DataWithPagination } from "@models/api"
 import { Book } from "@models/book"
 import { Category } from "@models/category"
 import { Response } from "@models/api"
@@ -37,8 +37,11 @@ export type Price = {
 
 const AllBookScreen = ({ type }: Props) => {
   const [books, setBooks] = useState<DataWithPagination<Book[]> | null>()
-  const [catagories, setCategories] = useState<Category[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
   const [page, setPage] = useState<number>(1)
+  const [categoryPage, setCategoryPage] = useState<number>(1)
+  const [categoryTotalPages, setCategoryTotalPages] = useState<number>(1)
+  const [isExpanded, setIsExpanded] = useState<boolean>(false)
   const route = useRouter()
   const [title, setTitle] = useState<string>("")
   const [lang, setLang] = useState<LANGUAGE>()
@@ -114,19 +117,51 @@ const AllBookScreen = ({ type }: Props) => {
     handleFetchBook()
   }, [page, lang, price])
 
+  const fetchCategories = async (page: number) => {
+    const response = await fetch(API_ENDPOINT + `/genres?page=${page}&limit=8`, {
+      headers: { "Content-Type": "application/json" },
+    })
+    const data = (await response.json()) as Response<any>
+    return data
+  }
+
   useEffect(() => {
-    const handleFetchCategorys = async () => {
-      const response = await fetch(API_ENDPOINT + "/genres?page=1&limit=8", {
-        headers: { "Content-Type": "application/json" },
-      })
-      const data = (await response.json()) as Response<any>
-      console.log(data)
-      if (!!data?.data?.results.length) {
-        setCategories(data.data.results)
+    const handleFetchCategories = async () => {
+      const data = await fetchCategories(categoryPage)
+      if (data.status === "success" && data.data?.results.length) {
+        setCategories((prevCategories) => {
+          const uniqueCategories = [
+            ...prevCategories,
+            ...data.data.results.filter(
+              (newCategory: Category) =>
+                !prevCategories.some((existingCategory) => existingCategory.id === newCategory.id)
+            ),
+          ]
+          return uniqueCategories
+        })
+        setCategoryTotalPages(data.data.totalPages)
       }
     }
-    handleFetchCategorys()
-  }, [])
+    handleFetchCategories()
+  }, [categoryPage])
+
+  const loadMoreCategories = () => {
+    if (categoryPage < categoryTotalPages) {
+      setCategoryPage(categoryPage + 1)
+      setIsExpanded(true)
+    }
+  }
+
+  const showLessCategories = async () => {
+    setCategories([])
+    setCategoryPage(1)
+    setIsExpanded(false)
+    const data = await fetchCategories(1)
+    if (data.status === "success" && data.data?.results.length) {
+      setCategories(data.data.results)
+      setCategoryTotalPages(data.data.totalPages)
+    }
+  }
 
   return (
     <div>
@@ -137,8 +172,8 @@ const AllBookScreen = ({ type }: Props) => {
       <div className="flex gap-8 px-40 py-8">
         <div className="w-[300px] rounded-lg bg-white p-4">
           <p className="pb-4 text-lg">Chủ đề tiêu biểu</p>
-          {catagories.length &&
-            catagories.map((categoryItem) => (
+          {categories.length &&
+            categories.map((categoryItem) => (
               <div
                 key={categoryItem.id}
                 onClick={() => route.push(`/category/${categoryItem.slug}`)}
@@ -148,6 +183,16 @@ const AllBookScreen = ({ type }: Props) => {
                 <p>{categoryItem.name}</p>
               </div>
             ))}
+          {isExpanded && (
+            <CustomButton onClick={showLessCategories} className="mt-4 w-full">
+              Thu gọn
+            </CustomButton>
+          )}
+          {!isExpanded && categoryPage < categoryTotalPages && (
+            <CustomButton onClick={loadMoreCategories} className="mt-4 w-full">
+              Xem thêm
+            </CustomButton>
+          )}
           <p className="py-4 text-lg">Theo ngôn ngữ</p>
           <div className="flex gap-2">
             <CustomButton onClick={() => setLang(LANGUAGE.VI)} isGhost={lang !== LANGUAGE.VI}>

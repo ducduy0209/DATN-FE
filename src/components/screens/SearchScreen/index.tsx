@@ -1,7 +1,6 @@
 import { CustomButton } from "@components/common/CustomButton"
 import RateStar from "@components/common/RateStar"
 import Icon from "@components/icons"
-import { MOCK_BOOKS } from "@constants/book"
 import React, { ChangeEvent, useEffect, useRef, useState } from "react"
 import {
   Button,
@@ -23,10 +22,6 @@ import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { LANGUAGE, Price } from "../AllBookScreen"
 
-type Props = {
-  keyword: string
-}
-
 const LIMIT = 10
 
 type ResultBooks = {
@@ -35,7 +30,11 @@ type ResultBooks = {
 
 const SearchScreen = () => {
   const [books, setBooks] = useState<DataWithPagination<Book[]>>()
-  const [catagories, setCategories] = useState<Category[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [initialCategories, setInitialCategories] = useState<Category[]>([]) // State to store the initial categories
+  const [categoryPage, setCategoryPage] = useState<number>(1)
+  const [categoryTotalPages, setCategoryTotalPages] = useState<number>(1)
+  const [isExpanded, setIsExpanded] = useState<boolean>(false)
   const [page, setPage] = useState<number>(1)
   const [sortBy, setSortBy] = useState<string>("")
   const [sortType, setSortType] = useState<string>("")
@@ -47,7 +46,6 @@ const SearchScreen = () => {
     to: undefined,
     from: undefined,
   })
-
   const [search, setSearch] = useState<string>()
   const searchRef = useRef<HTMLInputElement>(null)
 
@@ -82,9 +80,9 @@ const SearchScreen = () => {
   const handleSort = (sortBy: string, sortType: string) => {
     setSortBy(sortBy)
     setSortType(sortType)
-    const newSearchPrams = new URLSearchParams(searchParams)
-    newSearchPrams.set("sortBy", `${sortBy}:${sortType}`)
-    route.push(`/search?${newSearchPrams}`)
+    const newSearchParams = new URLSearchParams(searchParams)
+    newSearchParams.set("sortBy", `${sortBy}:${sortType}`)
+    route.push(`/search?${newSearchParams}`)
   }
 
   useEffect(() => {
@@ -97,7 +95,6 @@ const SearchScreen = () => {
     }
     if (parsedSearchParams) {
       const sort = parsedSearchParams.get("sortBy")?.split(":")
-      console.log(sort)
       if (sort) {
         setSortBy(sort[0])
         setSortType(sort[1])
@@ -145,7 +142,6 @@ const SearchScreen = () => {
           headers: { "Content-Type": "application/json" },
         })
         const data = (await response.json()) as Response<ResultBooks>
-        console.log(data)
         if (data.data?.result) {
           setBooks(data.data.result)
         }
@@ -154,19 +150,50 @@ const SearchScreen = () => {
     }
   }, [route.query, page, sortBy, sortType, lang, price])
 
+  const fetchCategories = async (page: number) => {
+    const response = await fetch(API_ENDPOINT + `/genres?page=${page}&limit=10`, {
+      headers: { "Content-Type": "application/json" },
+    })
+    const data = (await response.json()) as Response<any>
+    return data
+  }
+
   useEffect(() => {
-    const handleFetchCategorys = async () => {
-      const response = await fetch(API_ENDPOINT + "/genres?page=1&limit=8", {
-        headers: { "Content-Type": "application/json" },
-      })
-      const data = (await response.json()) as Response<any>
-      console.log(data)
-      if (!!data?.data?.results.length) {
+    const handleFetchCategories = async () => {
+      const data = await fetchCategories(1)
+      if (data.status === "success" && data.data?.results.length) {
         setCategories(data.data.results)
+        setInitialCategories(data.data.results) // Store initial categories
+        setCategoryTotalPages(data.data.totalPages)
       }
     }
-    handleFetchCategorys()
+    handleFetchCategories()
   }, [])
+
+  useEffect(() => {
+    if (categoryPage > 1) {
+      const handleFetchMoreCategories = async () => {
+        const data = await fetchCategories(categoryPage)
+        if (data.status === "success" && data.data?.results.length) {
+          setCategories((prevCategories) => [...prevCategories, ...data.data.results])
+        }
+      }
+      handleFetchMoreCategories()
+    }
+  }, [categoryPage])
+
+  const loadMoreCategories = () => {
+    if (categoryPage < categoryTotalPages) {
+      setCategoryPage(categoryPage + 1)
+      setIsExpanded(true)
+    }
+  }
+
+  const showLessCategories = () => {
+    setCategories(initialCategories) // Reset to initial categories
+    setCategoryPage(1)
+    setIsExpanded(false)
+  }
 
   return (
     <div>
@@ -188,8 +215,8 @@ const SearchScreen = () => {
       <div className="flex gap-8 px-40 py-8">
         <div className="w-[300px] rounded-lg bg-white p-4">
           <p className="pb-4 text-lg">Chủ đề tiêu biểu</p>
-          {catagories.length &&
-            catagories.map((categoryItem) => (
+          {categories.length &&
+            categories.map((categoryItem) => (
               <Link
                 href={`/category/${categoryItem.slug}`}
                 key={categoryItem.id}
@@ -199,6 +226,16 @@ const SearchScreen = () => {
                 <p>{categoryItem.name}</p>
               </Link>
             ))}
+          {isExpanded && (
+            <CustomButton onClick={showLessCategories} className="mt-4 w-full">
+              Thu gọn
+            </CustomButton>
+          )}
+          {!isExpanded && categoryPage < categoryTotalPages && (
+            <CustomButton onClick={loadMoreCategories} className="mt-4 w-full">
+              Xem thêm
+            </CustomButton>
+          )}
           <p className="py-4 text-lg">Theo ngôn ngữ</p>
           <div className="flex gap-2">
             <CustomButton onClick={() => setLang(LANGUAGE.VI)} isGhost={lang !== LANGUAGE.VI}>
